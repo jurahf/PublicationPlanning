@@ -12,6 +12,7 @@ namespace PublicationPlanning.Repositories
 {
     public interface IImageInfoRepository : IRepository<ImageInfo>
     {
+        Task<IEnumerable<ImageInfo>> GetByOrders(int startOrder, int endOrder);
     }
 
     public class ImageInfoFileRepository : IImageInfoRepository
@@ -200,6 +201,14 @@ namespace PublicationPlanning.Repositories
             lock (lockObject)
             {
                 return Task.FromResult(allData.FirstOrDefault(x => x.Id == id));
+            }
+        }
+
+        public Task<IEnumerable<ImageInfo>> GetByOrders(int startOrder, int endOrder)
+        {
+            lock (lockObject)
+            {
+                return Task.FromResult(allData.Where(x => x.Order >= startOrder && x.Order <= endOrder));
             }
         }
 

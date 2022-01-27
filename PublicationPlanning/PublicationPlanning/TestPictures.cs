@@ -44,9 +44,8 @@ namespace PublicationPlanning
 
                         foreach (string filepath in imageList.Photos.Take(5))
                         {
-                            await service.Insert(new ImageInfoViewModel()
+                            await service.InsertFirst(new ImageInfoViewModel()
                             {
-                                //Order = ++loadOrder,
                                 ImageRef = filepath,
                                 SourceType = ImageSourceType.Url
                             });

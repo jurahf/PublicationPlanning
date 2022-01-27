@@ -15,7 +15,7 @@ namespace PublicationPlanning.Services
     {
         Task<int> InsertFirst(ImageInfoViewModel entity);
 
-        //void MoveOrder(ImageInfo entity, int newOrder);
+        Task MoveOrder(ImageInfoViewModel entity, int newOrder);
     }
 
     public class ImageInfoService : BaseEntityService<ImageInfo, ImageInfoViewModel>, IImageInfoService
@@ -36,6 +36,30 @@ namespace PublicationPlanning.Services
             entity.Order = oldFirst == null ? 0 : oldFirst.Order - 1;
 
             return await base.Insert(entity);
+        }
+
+        public async Task MoveOrder(ImageInfoViewModel entity, int newOrder)
+        {
+            int oldOrder = entity.Order;
+
+            List<ImageInfo> imageList = 
+                (await repository.GetByOrders(Math.Min(oldOrder, newOrder), Math.Max(oldOrder, newOrder)))
+                .ToList();
+
+            int moveDirection = oldOrder < newOrder ? -1 : 1;
+            foreach (var image in imageList)
+            {
+                image.Order += moveDirection;
+            }
+
+            ImageInfo moved = imageList.FirstOrDefault(x => x.Id == entity.Id);
+            if (moved != null)
+                moved.Order = newOrder;
+
+            foreach (var image in imageList)
+            {
+                await repository.Update(image.Id, image);
+            }
         }
     }
 }

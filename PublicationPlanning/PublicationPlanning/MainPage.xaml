@@ -9,9 +9,10 @@
         </Frame>
 
         <StackLayout Orientation="Horizontal">
-            <Button Text="Добавить фото" Clicked="Button_Clicked" BackgroundColor="DarkSeaGreen"></Button>
-            <Button Text="Влево" Clicked="Button_Clicked" IsEnabled="False"></Button>
-            <Button Text="Вправо" Clicked="Button_Clicked" IsEnabled="False"></Button>
+            <Button Text="Добавить фото" Clicked="btnAddPhoto_Clicked" BackgroundColor="DarkSeaGreen"></Button>
+            <Button x:Name="btnToLeft" Text="Влево" Clicked="btnToLeft_Clicked" IsEnabled="False"></Button>
+            <Button x:Name="btnToRight" Text="Вправо" Clicked="btnToRight_Clicked" IsEnabled="False"></Button>
+            <Button Text="Обновить" Clicked="btnRefresh_Clicked"></Button>
         </StackLayout>
 
         <ScrollView Orientation="Vertical">            
@@ -24,8 +25,9 @@
         </ScrollView>
 
         <ActivityIndicator x:Name="activityIndicator"
-                           IsRunning="True"
-                           VerticalOptions="Center" />
+                           IsRunning="False"
+                           VerticalOptions="Center"
+                           IsVisible="False" />
     </StackLayout>
 
 </ContentPage>
