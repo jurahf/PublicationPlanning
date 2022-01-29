@@ -1,4 +1,5 @@
-﻿using PublicationPlanning.MainPageViewFeature.SelectImage;
+﻿using PublicationPlanning.MainPageViewFeature.DragAndDrop;
+using PublicationPlanning.MainPageViewFeature.SelectImage;
 using PublicationPlanning.Services;
 using PublicationPlanning.StoredModels;
 using PublicationPlanning.ViewModels;
@@ -18,7 +19,7 @@ using Xamarin.Forms;
 
 namespace PublicationPlanning
 {
-    public partial class MainPage : ContentPage, ISelectImageContext
+    public partial class MainPage : ContentPage, ISelectImageContext, IDragDropContext
     {
         private readonly IImageInfoService service;
         private const int imageSizeRequest = 128;
@@ -134,6 +135,11 @@ namespace PublicationPlanning
                 {
                     AddImageToLayout(image);
                 }
+
+                if (!allImages.Any())
+                {
+                    // TODO: заставку для пустого экрана
+                }
             }
             finally
             {
@@ -166,23 +172,48 @@ namespace PublicationPlanning
             SetUnselectStyle(frame);
 
             // жест нажатия - выделение картинки
-            image.GestureRecognizers.Add(
+            frame.GestureRecognizers.Add(
                 new TapGestureRecognizer()
                 {
                     Command = new SelectImageCommand(),
                     CommandParameter = new SelectImageCommandParameter(this, new ImageModelAndControl(imageInfo.Id, frame))
                 });
 
-            // TODO: перетаскивание
-            //image.GestureRecognizers.Add(
-            //    new DragGestureRecognizer()
-            //    {
-            //        DragStartingCommand = new DragAndDropStartCommand(),
-            //    },
-            //    new DropGestureRecognizer()
-            //    {
-            //        //DragOverCommand
-            //    });
+            // перетаскивание
+            var dragRecognizer = new DragGestureRecognizer()
+            {
+                DragStartingCommand = new DragAndDropStartCommand(),
+                DragStartingCommandParameter = this,
+                DropCompletedCommand = new DragAndDropCompletedCommand(),
+                DropCompletedCommandParameter = this
+            };
+            dragRecognizer.DragStarting += (s, a) =>
+            {
+                a.Data.Text = "";
+                //a.Data.Image = image.Source;
+                a.Data.Properties.Add("Id", imageInfo.Id);
+            };
+
+            frame.GestureRecognizers.Add(dragRecognizer);
+
+            // перетаскивание чего-то над объектом - реакция нижнего объекта
+            frame.GestureRecognizers.Add(
+                new DropGestureRecognizer()
+                {
+                    //DropCommand
+                    //DragLeaveCommand
+                    DragOverCommand = new SelectImageCommand(),
+                    DragOverCommandParameter = new SelectImageCommandParameter(this, new ImageModelAndControl(imageInfo.Id, frame))
+                });
+
+            // TODO: вариант: во фрейме сделать не сразу картинку, а AbsolutLayout, с картинкой и двумя областями,
+            // на которые сделать перетаскивание
+
+            //PanUpdatedEventArgs e; e.TotalX
+            //DragStartingEventArgs e; e.Data.
+            //DropCompletedEventArgs e; e.
+            //frame.X
+            //(dragRecognizer.Parent as Frame).X
 
             flexLayout.Children.Add(frame);
             FlexLayout.SetBasis(frame, new FlexBasis(0.33f, true));
@@ -192,7 +223,10 @@ namespace PublicationPlanning
             flexLayoutCells.Add((imageInfo.Order, imageInfo.Id, frame));
         }
 
-
+        public void StartOperation(string operationName)
+        {
+            lblDebug.Text = operationName;
+        }
 
         #region ImageSelectionContext
 
