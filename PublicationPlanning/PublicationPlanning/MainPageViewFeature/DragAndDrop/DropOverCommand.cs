@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace PublicationPlanning.MainPageViewFeature.DragAndDrop
 {
-    public class DragAndDropCompletedCommand : ICommand
+    public class DropOverCommand : ICommand
     {
         public event EventHandler CanExecuteChanged = delegate { };
 
@@ -16,12 +16,12 @@ namespace PublicationPlanning.MainPageViewFeature.DragAndDrop
 
         public void Execute(object parameter)
         {
-            var context = parameter as DragAndDropCompletedParameter;
+            var context = parameter as DropOverCommandParameter;
 
             if (context == null)
                 return;
 
-            context.Interactor.CompleteDrop(context.DraggedObject);
+            context.Interactor.OnDragOver(context.DragOverObject);
         }
     }
 }

@@ -8,8 +8,6 @@
             <Label Text="Publication planning" HorizontalTextAlignment="Center" TextColor="White" FontSize="36"/>
         </Frame>
 
-        <Label x:Name="lblDebug" />
-
         <StackLayout Orientation="Horizontal">
             <Button Text="Добавить фото" Clicked="btnAddPhoto_Clicked" BackgroundColor="DarkSeaGreen"></Button>
             <Button x:Name="btnToLeft" Text="Влево" Clicked="btnToLeft_Clicked" IsEnabled="False"></Button>

@@ -6,6 +6,10 @@ namespace PublicationPlanning.MainPageViewFeature.DragAndDrop
 {
     public interface IDragDropContext
     {
-        void StartOperation(string operationName);
+        void OnDragOver(DragDropInfo landing);
+
+        void OnDragLeave(DragDropInfo landing);
+
+        void CompleteDrop(ImageModelAndControl src);
     }
 }

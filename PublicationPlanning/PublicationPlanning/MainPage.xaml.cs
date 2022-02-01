@@ -150,6 +150,7 @@ namespace PublicationPlanning
 
         private void AddImageToLayout(ImageInfoViewModel imageInfo)
         {
+            // картинка
             Image image = new Image
             {
                 Source = imageInfo.ImageSource,
@@ -160,9 +161,36 @@ namespace PublicationPlanning
                 HeightRequest = imageSizeRequest,
             };
 
+            // два посадочных места для картинок
+            Frame leftLending = new Frame()
+            {
+                VerticalOptions = LayoutOptions.CenterAndExpand,
+                WidthRequest = imageSizeRequest / 2,
+                HeightRequest = imageSizeRequest,
+                BackgroundColor = Color.Transparent
+            };
+
+            Frame rightLending = new Frame()
+            {
+                VerticalOptions = LayoutOptions.CenterAndExpand,
+                WidthRequest = imageSizeRequest / 2,
+                HeightRequest = imageSizeRequest,
+                BackgroundColor = Color.Transparent
+            };
+
+            // располагаются в шаблоне друг на друге
+            AbsoluteLayout absolut = new AbsoluteLayout();
+            absolut.Children.Add(image);
+            AbsoluteLayout.SetLayoutBounds(image, new Rectangle(0, 0, imageSizeRequest, imageSizeRequest));
+            absolut.Children.Add(leftLending);
+            AbsoluteLayout.SetLayoutBounds(leftLending, new Rectangle(0, 0, imageSizeRequest / 2, imageSizeRequest));
+            absolut.Children.Add(rightLending);
+            AbsoluteLayout.SetLayoutBounds(rightLending, new Rectangle(imageSizeRequest / 2, 0, imageSizeRequest / 2, imageSizeRequest));
+
+            // и все вместе помещены во фрейм
             Frame frame = new Frame()
             {
-                Content = image,
+                Content = absolut,
 
                 VerticalOptions = LayoutOptions.CenterAndExpand,
                 WidthRequest = imageSizeRequest,
@@ -182,10 +210,8 @@ namespace PublicationPlanning
             // перетаскивание
             var dragRecognizer = new DragGestureRecognizer()
             {
-                DragStartingCommand = new DragAndDropStartCommand(),
-                DragStartingCommandParameter = this,
                 DropCompletedCommand = new DragAndDropCompletedCommand(),
-                DropCompletedCommandParameter = this
+                DropCompletedCommandParameter = new DragAndDropCompletedParameter(this, new ImageModelAndControl(imageInfo.Id, frame))
             };
             dragRecognizer.DragStarting += (s, a) =>
             {
@@ -196,24 +222,38 @@ namespace PublicationPlanning
 
             frame.GestureRecognizers.Add(dragRecognizer);
 
+
             // перетаскивание чего-то над объектом - реакция нижнего объекта
-            frame.GestureRecognizers.Add(
+            leftLending.GestureRecognizers.Add(
                 new DropGestureRecognizer()
                 {
-                    //DropCommand
-                    //DragLeaveCommand
-                    DragOverCommand = new SelectImageCommand(),
-                    DragOverCommandParameter = new SelectImageCommandParameter(this, new ImageModelAndControl(imageInfo.Id, frame))
+                    DragLeaveCommand = new DragLeaveCommand(),
+                    DragLeaveCommandParameter = new DropOverCommandParameter(
+                        this,
+                        new DragDropInfo(imageInfo.Id, leftLending, DropOnObjectDirection.ToLeft)),
+                    DragOverCommand = new DropOverCommand(),
+                    DragOverCommandParameter = new DropOverCommandParameter(
+                        this, 
+                        new DragDropInfo(imageInfo.Id, leftLending, DropOnObjectDirection.ToLeft))
                 });
 
-            // TODO: вариант: во фрейме сделать не сразу картинку, а AbsolutLayout, с картинкой и двумя областями,
-            // на которые сделать перетаскивание
+            rightLending.GestureRecognizers.Add(
+                new DropGestureRecognizer()
+                {
+                    DragLeaveCommand = new DragLeaveCommand(),
+                    DragLeaveCommandParameter = new DropOverCommandParameter(
+                        this,
+                        new DragDropInfo(imageInfo.Id, rightLending, DropOnObjectDirection.ToRight)),
+                    DragOverCommand = new DropOverCommand(),
+                    DragOverCommandParameter = new DropOverCommandParameter(
+                        this,
+                        new DragDropInfo(imageInfo.Id, rightLending, DropOnObjectDirection.ToRight))
+                });
 
-            //PanUpdatedEventArgs e; e.TotalX
-            //DragStartingEventArgs e; e.Data.
-            //DropCompletedEventArgs e; e.
-            //frame.X
-            //(dragRecognizer.Parent as Frame).X
+            // TODO:
+            // в DropCommand (или DropCompletedCommand) реализовать перестановку картинок
+            // в конце перестановки мы должны знать исходную картинку, исходный контрол, конечный контрол
+            // то есть в этом методе определяется, 1. как взять картинку 2. как поместить картинку на место этой
 
             flexLayout.Children.Add(frame);
             FlexLayout.SetBasis(frame, new FlexBasis(0.33f, true));
@@ -223,10 +263,82 @@ namespace PublicationPlanning
             flexLayoutCells.Add((imageInfo.Order, imageInfo.Id, frame));
         }
 
-        public void StartOperation(string operationName)
+        #region DragDropContext
+
+        private List<DragDropInfo> activeDropLanding = new List<DragDropInfo>();
+        private object dropLock = new object();
+
+        public void OnDragOver(DragDropInfo landing)
         {
-            lblDebug.Text = operationName;
+            lock (dropLock)
+            {
+                if (!activeDropLanding.Any(x => x.ImageInfoId == landing.ImageInfoId && x.Direction == landing.Direction))
+                {
+                    SetActiveDropStyle(landing.Control);
+                    activeDropLanding.Add(landing);
+                }
+            }
         }
+
+        public void OnDragLeave(DragDropInfo landing)
+        {
+            lock (dropLock)
+            {
+                foreach (var frame in activeDropLanding
+                    .Where(x => x.ImageInfoId == landing.ImageInfoId && x.Direction == landing.Direction))
+                {
+                    SetUnactiveDropStyle(frame.Control);
+                }
+
+                activeDropLanding = activeDropLanding
+                    .Where(x => x.ImageInfoId != landing.ImageInfoId && x.Direction == landing.Direction)
+                    .ToList();
+            }
+        }
+
+        public async void CompleteDrop(ImageModelAndControl src)
+        {
+            // src перемещаем слева или справа от DragDropInfo (надеюсь, он там один или два аналогичных)
+            // перемещаем в базе и на форме
+            // отменяем выделения всех областей для посадки
+
+            if (!activeDropLanding.Any())
+                return;
+
+            var activeLandingInfo = activeDropLanding.First();      // ?!
+            ImageInfoViewModel dragged = await service.Get(src.ImageInfoId);
+            ImageInfoViewModel landing = await service.Get(activeLandingInfo.ImageInfoId);
+
+            int startOrder = dragged.Order;
+            int endOrder = activeLandingInfo.Direction == DropOnObjectDirection.ToLeft
+                ? landing.Order
+                : landing.Order + 1;
+
+            // не надо двигать, если startOrder == endOrder || startOrder + 1 = endOrder (?)
+
+            // 1 2 3
+            // если 1 двигается на левую часть 2, то новый индекс 1 двигать не надо, если на правую часть 2, то его новый индекс - 2
+
+            // 1 2 3
+            // если 2 двигается на левую часть 1 - новый индекс 1, если на правую часть 2, то новый индекс 2, двигать не надо
+
+            // похоже, надо понять, какая карточка правее, и от этого считать индексы
+            // если двигаем слева направо, то границы landing.Order - 1 и landing.Order
+            // если справа налево, то границы landing.Order и landing.Order + 1
+        }
+
+        private void SetActiveDropStyle(View frame)
+        {
+            frame.BackgroundColor = Color.FromRgba(200, 200, 0, 0.4);
+        }
+
+        private void SetUnactiveDropStyle(View frame)
+        {
+            frame.BackgroundColor = Color.Transparent;
+        }
+
+        # endregion DragDropContext
+
 
         #region ImageSelectionContext
 
