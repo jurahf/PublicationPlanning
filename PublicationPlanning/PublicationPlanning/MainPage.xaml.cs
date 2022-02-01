@@ -23,7 +23,7 @@ namespace PublicationPlanning
     {
         private readonly IImageInfoService service;
         private const int imageSizeRequest = 128;
-        List<(int order, int modelId, BindableObject view)> flexLayoutCells = new List<(int, int, BindableObject)>();
+        List<(int order, int modelId, View view)> flexLayoutCells = new List<(int, int, View)>();
 
         public MainPage(IImageInfoService service)
         {
@@ -41,57 +41,28 @@ namespace PublicationPlanning
             await PickImageAsync();
         }
 
-        private async void btnToLeft_Clicked(object sender, EventArgs e)
-        {
-            await MoveSelectedImage((x) => x - 1);
-        }
-
-        private async void btnToRight_Clicked(object sender, EventArgs e)
-        {
-            await MoveSelectedImage((x) => x + 1);
-        }
-
-        private async Task MoveSelectedImage(Func<int, int> indexFunc)
-        {
-            ImageModelAndControl selection = GetSelection();
-
-            if (selection == null)
-                return;
-
-            ImageInfoViewModel model = await service.Get(selection.ImageInfoId);
-
-            if (model == null)
-                return;
-
-            int oldIndex = model.Order;
-            int newIndex = indexFunc(model.Order);
-
-            // двигаем в базе
-            await service.MoveOrder(model, newIndex);
-
-            // двигаем в представлении
-            var movedList = flexLayoutCells
-                .Where(x =>
-                    x.order >= Math.Min(oldIndex, newIndex)
-                    && x.order <= Math.Max(oldIndex, newIndex))
-                .ToList();
-
-            int moveDirection = oldIndex < newIndex ? -1 : 1;
-            foreach (var pair in movedList)
-            {
-                int newViewIndex = pair.modelId == selectedImage.ImageInfoId
-                    ? newIndex
-                    : pair.order + moveDirection;
-
-                flexLayoutCells.Remove(pair);
-                flexLayoutCells.Add((newViewIndex, pair.modelId, pair.view));
-                FlexLayout.SetOrder(pair.view, newViewIndex);
-            }
-        }
-
         private async void btnRefresh_Clicked(object sender, EventArgs e)
         {
             await ShowImages();
+        }
+
+        private async void btnRemove_Clicked(object sender, EventArgs e)
+        {
+            if (selectedImage == null)
+                return;
+
+            int deletedId = selectedImage.ImageInfoId;
+
+            await service.Delete(deletedId);
+            (_, _, View view) = flexLayoutCells.FirstOrDefault(x => x.modelId == deletedId);
+
+            if (view != null)
+            {
+                flexLayout.Children.Remove(view);
+                flexLayoutCells = flexLayoutCells.Where(x => x.modelId != deletedId).ToList();
+            }
+
+            ClearSelection();
         }
 
         private async Task PickImageAsync()
@@ -250,11 +221,6 @@ namespace PublicationPlanning
                         new DragDropInfo(imageInfo.Id, rightLending, DropOnObjectDirection.ToRight))
                 });
 
-            // TODO:
-            // в DropCommand (или DropCompletedCommand) реализовать перестановку картинок
-            // в конце перестановки мы должны знать исходную картинку, исходный контрол, конечный контрол
-            // то есть в этом методе определяется, 1. как взять картинку 2. как поместить картинку на место этой
-
             flexLayout.Children.Add(frame);
             FlexLayout.SetBasis(frame, new FlexBasis(0.33f, true));
 
@@ -299,9 +265,6 @@ namespace PublicationPlanning
         public async void CompleteDrop(ImageModelAndControl src)
         {
             // src перемещаем слева или справа от DragDropInfo (надеюсь, он там один или два аналогичных)
-            // перемещаем в базе и на форме
-            // отменяем выделения всех областей для посадки
-
             if (!activeDropLanding.Any())
                 return;
 
@@ -310,21 +273,62 @@ namespace PublicationPlanning
             ImageInfoViewModel landing = await service.Get(activeLandingInfo.ImageInfoId);
 
             int startOrder = dragged.Order;
-            int endOrder = activeLandingInfo.Direction == DropOnObjectDirection.ToLeft
-                ? landing.Order
-                : landing.Order + 1;
+            int endOrder;
 
-            // не надо двигать, если startOrder == endOrder || startOrder + 1 = endOrder (?)
+            if (dragged.Order < landing.Order)
+            {
+                endOrder = activeLandingInfo.Direction == DropOnObjectDirection.ToLeft
+                    ? landing.Order - 1
+                    : landing.Order;
+            }
+            else if (dragged.Order > landing.Order)
+            {
+                endOrder = activeLandingInfo.Direction == DropOnObjectDirection.ToLeft
+                    ? landing.Order
+                    : landing.Order + 1;
+            }
+            else
+            {
+                endOrder = dragged.Order;
+            }
 
-            // 1 2 3
-            // если 1 двигается на левую часть 2, то новый индекс 1 двигать не надо, если на правую часть 2, то его новый индекс - 2
+            if (startOrder != endOrder)
+            {
+                // перемещаем в базе
+                await service.MoveOrder(dragged, endOrder);
 
-            // 1 2 3
-            // если 2 двигается на левую часть 1 - новый индекс 1, если на правую часть 2, то новый индекс 2, двигать не надо
+                // и на форме
+                MoveImageOnLayout(dragged.Id, startOrder, endOrder);
+            }
 
-            // похоже, надо понять, какая карточка правее, и от этого считать индексы
-            // если двигаем слева направо, то границы landing.Order - 1 и landing.Order
-            // если справа налево, то границы landing.Order и landing.Order + 1
+            // отменяем выделения всех областей для посадки
+            foreach (var active in activeDropLanding)
+            {
+                SetUnactiveDropStyle(active.Control);
+            }
+
+            activeDropLanding.Clear();
+        }
+
+        private void MoveImageOnLayout(int draggedId, int oldIndex, int newIndex)
+        {
+            var movedList = flexLayoutCells
+                .Where(x =>
+                    x.order >= Math.Min(oldIndex, newIndex)
+                    && x.order <= Math.Max(oldIndex, newIndex))
+                .ToList();
+
+            int moveDirection = oldIndex < newIndex ? -1 : 1;
+            foreach (var pair in movedList)
+            {
+                int newViewIndex = pair.modelId == draggedId
+                    ? newIndex
+                    : pair.order + moveDirection;
+
+                flexLayoutCells.Remove(pair);
+                flexLayoutCells.Add((newViewIndex, pair.modelId, pair.view));
+                FlexLayout.SetOrder(pair.view, newViewIndex);
+            }
         }
 
         private void SetActiveDropStyle(View frame)
@@ -398,8 +402,7 @@ namespace PublicationPlanning
 
         private void EnableImageOperationButtons(bool isEnable)
         {
-            btnToLeft.IsEnabled = isEnable;
-            btnToRight.IsEnabled = isEnable;
+            btnRemove.IsEnabled = isEnable;
         }
 
         #endregion

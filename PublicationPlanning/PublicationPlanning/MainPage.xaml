@@ -10,9 +10,22 @@
 
         <StackLayout Orientation="Horizontal">
             <Button Text="Добавить фото" Clicked="btnAddPhoto_Clicked" BackgroundColor="DarkSeaGreen"></Button>
-            <Button x:Name="btnToLeft" Text="Влево" Clicked="btnToLeft_Clicked" IsEnabled="False"></Button>
-            <Button x:Name="btnToRight" Text="Вправо" Clicked="btnToRight_Clicked" IsEnabled="False"></Button>
-            <Button Text="Обновить" Clicked="btnRefresh_Clicked"></Button>
+            <ImageButton 
+                HorizontalOptions="Center" 
+                VerticalOptions="Center" 
+                Source="refresh.png"
+                HeightRequest="60"
+                Padding="20, 5, 20, 5"
+                Clicked="btnRefresh_Clicked"></ImageButton>
+            <ImageButton 
+                x:Name="btnRemove"
+                HorizontalOptions="Center" 
+                VerticalOptions="Center" 
+                Source="remove.png"
+                HeightRequest="60"
+                Padding="15, 5, 15, 5"
+                IsEnabled="false"
+                Clicked="btnRemove_Clicked"></ImageButton>            
         </StackLayout>
 
         <ScrollView Orientation="Vertical">            
