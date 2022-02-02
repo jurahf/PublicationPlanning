@@ -22,8 +22,7 @@ namespace PublicationPlanning
     public partial class MainPage : ContentPage, ISelectImageContext, IDragDropContext
     {
         private readonly IImageInfoService service;
-        private int imageSizeRequest = 128;
-        private const int spacePixel = 5;
+        private const int spacePixel = 2;
         List<(int order, int modelId, View view)> flexLayoutCells = new List<(int, int, View)>();
 
         public MainPage(IImageInfoService service)
@@ -35,6 +34,8 @@ namespace PublicationPlanning
             //new TestPictures(service).LoadTestDataToStorage();
 
             ShowImages();
+
+            this.SizeChanged += async (s, a) => await ShowImages();
         }
 
         private async void btnAddPhoto_Clicked(object sender, EventArgs e)
@@ -100,6 +101,7 @@ namespace PublicationPlanning
         {
             activityIndicator.IsRunning = true;
             activityIndicator.IsVisible = true;
+            pnlEmpty.IsVisible = false;
             ClearSelection();
 
             try
@@ -115,7 +117,7 @@ namespace PublicationPlanning
 
                 if (!allImages.Any())
                 {
-                    // TODO: заставку для пустого экрана
+                    pnlEmpty.IsVisible = true;
                 }
             }
             finally
@@ -130,7 +132,7 @@ namespace PublicationPlanning
             double widthBase = 
                 Application.Current?.MainPage?.Width 
                 ?? (DeviceDisplay.MainDisplayInfo.Width / DeviceDisplay.MainDisplayInfo.Density);
-            imageSizeRequest = (int)(widthBase * 0.33) - (spacePixel * 2) + 1;
+            int imageSizeRequest = (int)(widthBase * 0.33) - (spacePixel * 2) + 1;
 
             // картинка
             Image image = new Image

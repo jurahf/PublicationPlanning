@@ -5,7 +5,7 @@
 
     <StackLayout>
         <Frame BackgroundColor="#2196F3" Padding="24" CornerRadius="0">
-            <Label Text="Publication planning" HorizontalTextAlignment="Center" TextColor="White" FontSize="36"/>
+            <Label Text="Publication planning" LineBreakMode="NoWrap" HorizontalTextAlignment="Center" TextColor="White" FontSize="32"/>
         </Frame>
 
         <StackLayout Orientation="Horizontal">
@@ -36,6 +36,15 @@
                         AlignItems="Center">
             </FlexLayout>
         </ScrollView>
+
+        <StackLayout x:Name="pnlEmpty" Orientation="Vertical" Margin="30" IsVisible="false">
+            <Label HorizontalTextAlignment="Center" FontSize="Large">
+                This is where your photos will be displayed.
+            </Label>
+            <Label HorizontalTextAlignment="Center" FontSize="Large">
+                Add them using the button above.
+            </Label>
+        </StackLayout>
 
         <ActivityIndicator x:Name="activityIndicator"
                            IsRunning="False"

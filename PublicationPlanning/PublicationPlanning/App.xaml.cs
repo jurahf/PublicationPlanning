@@ -2,6 +2,7 @@
 using PublicationPlanning.Converters;
 using PublicationPlanning.Repositories;
 using PublicationPlanning.Services;
+using PublicationPlanning.Settings;
 using PublicationPlanning.StoredModels;
 using PublicationPlanning.ViewModels;
 using System;
@@ -14,19 +15,18 @@ namespace PublicationPlanning
     {
         private static IServiceProvider serviceProvider { get; set; }
 
-        public App()
+        public App(ServiceCollection services)
         {
             InitializeComponent();
 
-            SetupServices();
+            SetupServices(services);
 
             MainPage = new MainPage(serviceProvider.GetService<IImageInfoService>());
         }
 
-        void SetupServices()
+        void SetupServices(ServiceCollection services)
         {
-            var services = new ServiceCollection();
-
+            services.AddSingleton<ISettings, DefaultSettings>();
             services.AddSingleton<IEntityConverter<ImageInfo, ImageInfoViewModel>, ImageInfoConverter>();
             services.AddSingleton<IImageInfoRepository, ImageInfoFileRepository>();
             services.AddSingleton<IImageInfoService, ImageInfoService>();

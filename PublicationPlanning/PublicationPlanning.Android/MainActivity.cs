@@ -4,6 +4,8 @@ using Android.App;
 using Android.Content.PM;
 using Android.Runtime;
 using Android.OS;
+using Microsoft.Extensions.DependencyInjection;
+using PublicationPlanning.ImageResizer;
 
 namespace PublicationPlanning.Droid
 {
@@ -16,8 +18,18 @@ namespace PublicationPlanning.Droid
 
             Xamarin.Essentials.Platform.Init(this, savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-            LoadApplication(new App());
+
+            ServiceCollection services = new ServiceCollection();
+            ConfigureServicesAndroid(services);
+
+            LoadApplication(new App(services));
         }
+
+        private void ConfigureServicesAndroid(ServiceCollection services)
+        {
+            services.AddSingleton<IImageResizer, ImageResizer>();
+        }
+
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
         {
             Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);

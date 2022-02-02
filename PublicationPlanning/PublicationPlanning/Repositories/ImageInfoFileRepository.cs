@@ -1,4 +1,6 @@
-﻿using PublicationPlanning.StoredModels;
+﻿using PublicationPlanning.ImageResizer;
+using PublicationPlanning.Settings;
+using PublicationPlanning.StoredModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,13 +24,17 @@ namespace PublicationPlanning.Repositories
         private const string fieldSeparator = "\t";
         private const int fieldsCount = 4;
         private readonly string basePath;
+        private readonly IImageResizer imageResizer;
+        private readonly ISettings settings;
         private const int saveDebounceSec = 1;
         private int saveRequestCount = 0;
         private List<ImageInfo> allData = new List<ImageInfo>();    // TODO: HashTable?
         private object lockObject = new object();
 
-        public ImageInfoFileRepository()
+        public ImageInfoFileRepository(IImageResizer imageResizer, ISettings settings)
         {
+            this.imageResizer = imageResizer;
+            this.settings = settings;
             basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
             LoadAllData();
@@ -310,8 +316,19 @@ namespace PublicationPlanning.Repositories
                 // скопировать файл изображения
                 string extension = Path.GetExtension(entity.ImageRef);
                 string fileName = Path.ChangeExtension(Path.GetRandomFileName(), extension);    // меняем имя на случай повторного добавления
+                ImageFormat format = ParseImageFormat(extension);
                 string filePath = Path.Combine(basePath, fileName);
-                File.Copy(entity.ImageRef, filePath);
+
+                if (settings.ResizeImages)
+                {
+                    byte[] bytes = File.ReadAllBytes(entity.ImageRef);
+                    byte[] resizedBytes = await imageResizer.ResizeImage(bytes, settings.ImageResizeWidth, settings.ImageResizeHeight, format);
+                    File.WriteAllBytes(filePath, resizedBytes);
+                }
+                else
+                {
+                    File.Copy(entity.ImageRef, filePath);
+                }
 
                 return filePath;
             }
@@ -320,6 +337,7 @@ namespace PublicationPlanning.Repositories
                 // скачать и сохранить изображение
                 string extension = GetExtensionFromUri(entity.ImageRef);
                 string fileName = Path.ChangeExtension(Path.GetRandomFileName(), extension);
+                ImageFormat format = ParseImageFormat(extension);
                 string filePath = Path.Combine(basePath, fileName);
 
                 using (WebClient webClient = new WebClient())
@@ -329,7 +347,15 @@ namespace PublicationPlanning.Repositories
                         Uri uri = new Uri(entity.ImageRef);
                         byte[] data = await webClient.DownloadDataTaskAsync(uri);
 
-                        File.WriteAllBytes(filePath, data);
+                        if (settings.ResizeImages)
+                        {
+                            byte[] resizedBytes = await imageResizer.ResizeImage(data, settings.ImageResizeWidth, settings.ImageResizeHeight, format);
+                            File.WriteAllBytes(filePath, resizedBytes);
+                        }
+                        else
+                        {
+                            File.WriteAllBytes(filePath, data);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -340,9 +366,22 @@ namespace PublicationPlanning.Repositories
                 return filePath;
             }
 
-            // TODO: подрезать/сжать изображение
-
             return entity.ImageRef;
+        }
+
+        private ImageFormat ParseImageFormat(string extension)
+        {
+            switch (extension.ToLower().Trim('.', ' '))
+            {
+                case "jpg":
+                case "jpeg":
+                    return ImageFormat.JPEG;
+                case "png":
+                    return ImageFormat.PNG;
+
+                default:
+                    return ImageFormat.JPEG;
+            }
         }
 
         private string GetExtensionFromUri(string imageRef)
