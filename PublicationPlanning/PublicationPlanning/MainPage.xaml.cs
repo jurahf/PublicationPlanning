@@ -22,7 +22,8 @@ namespace PublicationPlanning
     public partial class MainPage : ContentPage, ISelectImageContext, IDragDropContext
     {
         private readonly IImageInfoService service;
-        private const int imageSizeRequest = 128;
+        private int imageSizeRequest = 128;
+        private const int spacePixel = 5;
         List<(int order, int modelId, View view)> flexLayoutCells = new List<(int, int, View)>();
 
         public MainPage(IImageInfoService service)
@@ -126,6 +127,11 @@ namespace PublicationPlanning
 
         private void AddImageToLayout(ImageInfoViewModel imageInfo)
         {
+            double widthBase = 
+                Application.Current?.MainPage?.Width 
+                ?? (DeviceDisplay.MainDisplayInfo.Width / DeviceDisplay.MainDisplayInfo.Density);
+            imageSizeRequest = (int)(widthBase * 0.33) - (spacePixel * 2) + 1;
+
             // картинка
             Image image = new Image
             {
@@ -390,7 +396,7 @@ namespace PublicationPlanning
 
             frame.BorderColor = Color.Red;
             frame.BackgroundColor = Color.Red;
-            frame.Padding = new Thickness(5);
+            frame.Padding = new Thickness(spacePixel);
             frame.Margin = new Thickness(0);
         }
 
@@ -401,7 +407,7 @@ namespace PublicationPlanning
 
             frame.BorderColor = Color.Default;
             frame.BackgroundColor = Color.Default;
-            frame.Margin = new Thickness(5);
+            frame.Margin = new Thickness(spacePixel);
             frame.Padding = new Thickness(0);
         }
 
