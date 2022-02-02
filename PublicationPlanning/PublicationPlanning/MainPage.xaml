@@ -9,7 +9,7 @@
         </Frame>
 
         <StackLayout Orientation="Horizontal">
-            <Button Text="Добавить фото" Clicked="btnAddPhoto_Clicked" BackgroundColor="DarkSeaGreen"></Button>
+            <Button Margin="10, 0, 0, 0" Text="Add photo" Clicked="btnAddPhoto_Clicked" BackgroundColor="DarkSeaGreen"></Button>
             <ImageButton 
                 HorizontalOptions="Center" 
                 VerticalOptions="Center" 

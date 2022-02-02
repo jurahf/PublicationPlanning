@@ -51,6 +51,11 @@ namespace PublicationPlanning
             if (selectedImage == null)
                 return;
 
+            bool approve = await DisplayAlert("Delete", "Delete this image?", "Delete", "Cancel");
+
+            if (!approve)
+                return;
+
             int deletedId = selectedImage.ImageInfoId;
 
             await service.Delete(deletedId);
