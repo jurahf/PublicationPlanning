@@ -17,65 +17,24 @@ namespace PublicationPlanning.Repositories
         Task<IEnumerable<ImageInfo>> GetByOrders(int startOrder, int endOrder);
     }
 
-    public class ImageInfoFileRepository : IImageInfoRepository
+    public class ImageInfoFileRepository : BaseFileRepository<ImageInfo>, IImageInfoRepository
     {
-        private const string storageFileNamePattern = "ImageInfo-*.txt";
-        private const string storageFileNameFormat = "ImageInfo-{0:yyyy-MM-dd-HH-mm-ss}.txt";
         private const string fieldSeparator = "\t";
-        private const int fieldsCount = 4;
-        private readonly string basePath;
+        private const int fieldsCount = 4;        
         private readonly IImageResizer imageResizer;
         private readonly ISettings settings;
-        private const int saveDebounceSec = 1;
-        private int saveRequestCount = 0;
-        private List<ImageInfo> allData = new List<ImageInfo>();    // TODO: HashTable?
-        private object lockObject = new object();
 
         public ImageInfoFileRepository(IImageResizer imageResizer, ISettings settings)
+            : base()
         {
             this.imageResizer = imageResizer;
             this.settings = settings;
-            basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-
-            LoadAllData();
+            
 
             // TODO: метод для проверки кэша картинок и удаления ненужных, удаления не новейших версий файла
         }
 
-        private async Task LoadAllData()
-        {
-            try
-            {
-                string[] storageFiles = Directory.GetFiles(basePath, storageFileNamePattern);
-
-                if (!storageFiles.Any())
-                {
-                    //CreateStorageFile();
-                    allData = new List<ImageInfo>();
-                    return;
-                }
-
-                string lastFile = storageFiles.Max();
-                string[] lines;
-                lock (lockObject)
-                {
-                    lines = File.ReadAllLines(lastFile);
-                }
-
-                allData = new List<ImageInfo>();
-                foreach (var line in lines)
-                {
-                    allData.Add(ConvertToEntity(line));
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new FileLoadException("Can't to load storage file", ex);
-                // TODO: log
-            }
-        }
-
-        private ImageInfo ConvertToEntity(string line)
+        protected override ImageInfo ConvertToEntity(string line)
         {
             string[] fields = line.Split(new string[] { fieldSeparator }, StringSplitOptions.None);
 
@@ -110,7 +69,7 @@ namespace PublicationPlanning.Repositories
             };
         }
 
-        private string ConvertToText(ImageInfo entity)
+        protected override string ConvertToText(ImageInfo entity)
         {
             if (entity.Id <= 0)
                 throw new ArgumentException("Entity must have a positive id");
@@ -129,87 +88,6 @@ namespace PublicationPlanning.Repositories
             return string.Join(fieldSeparator, fields);
         }
 
-        private void SaveFileRequest()
-        {
-            Interlocked.Increment(ref saveRequestCount);
-
-            Task.Run(() => RealFileSave());
-        }
-
-        private async Task RealFileSave()
-        {
-            await Task.Delay(saveDebounceSec * 1000);
-
-            Interlocked.Decrement(ref saveRequestCount);
-
-            if (saveRequestCount == 0)
-                UpgradeStorage();
-        }
-
-        private void UpgradeStorage()
-        {
-            SaveStorageFile();
-            DeleteOldStorageFiles();
-        }
-
-        private void SaveStorageFile()
-        {
-            try
-            {
-                lock (lockObject)
-                {
-                    string fileName = Path.Combine(basePath, string.Format(storageFileNameFormat, DateTime.Now));
-                    List<string> lines = allData.Select(x => ConvertToText(x)).ToList();
-                    File.WriteAllLines(fileName, lines);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new FileNotFoundException("Can't to save data", ex);
-                // TODO: log
-            }
-        }
-
-        private void DeleteOldStorageFiles()
-        {
-            try
-            {
-                string[] storageFiles = Directory.GetFiles(basePath, storageFileNamePattern);
-
-                if (storageFiles.Length <= 1)
-                    return;
-
-                foreach (var file in storageFiles.OrderByDescending(x => x).Skip(1))
-                {
-                    File.Delete(file);
-                }
-            }
-            catch (Exception ex)
-            {
-                // TODO: log
-            }
-        }
-
-        #region IRepository
-
-        public Task<IEnumerable<ImageInfo>> GetPage(int page, int limit)
-        {
-            lock (lockObject)
-            {
-                return Task.FromResult(allData.OrderBy(x => x.DefaultOrder())
-                    .Skip(page * limit)
-                    .Take(limit));
-            }
-        }
-
-        public Task<ImageInfo> Get(int id)
-        {
-            lock (lockObject)
-            {
-                return Task.FromResult(allData.FirstOrDefault(x => x.Id == id));
-            }
-        }
-
         public Task<IEnumerable<ImageInfo>> GetByOrders(int startOrder, int endOrder)
         {
             lock (lockObject)
@@ -218,7 +96,7 @@ namespace PublicationPlanning.Repositories
             }
         }
 
-        public async Task<int> Update(int id, ImageInfo entity)
+        public override async Task<int> Update(int id, ImageInfo entity)
         {
             if (id <= 0)
                 return await Insert(entity);  // спорно
@@ -236,12 +114,12 @@ namespace PublicationPlanning.Repositories
                 allData.Add(entity);
             }
 
-            SaveFileRequest();
+            SaveChangesRequest();
 
             return id;
         }
 
-        public async Task<int> Insert(ImageInfo entity)
+        public override async Task<int> Insert(ImageInfo entity)
         {
             if (string.IsNullOrEmpty(entity.ImageRef))
                 throw new ArgumentException("Image ref is not declared");
@@ -255,12 +133,12 @@ namespace PublicationPlanning.Repositories
                 allData.Add(entity);
             }
 
-            SaveFileRequest();
+            SaveChangesRequest();
 
             return entity.Id;
         }
 
-        public async Task<bool> Delete(int id)
+        public override Task<bool> Delete(int id)
         {
             ImageInfo image = allData.FirstOrDefault(x => x.Id == id);
             lock (lockObject)
@@ -273,8 +151,8 @@ namespace PublicationPlanning.Repositories
                 DeleteImageFile(image.ImageRef);
             }
 
-            SaveFileRequest();
-            return image != null;
+            SaveChangesRequest();
+            return Task.FromResult(image != null);
         }
 
         private void DeleteImageFile(string file)
@@ -288,16 +166,6 @@ namespace PublicationPlanning.Repositories
             {
                 // TODO: log
             }
-        }
-
-        #endregion IRepository
-
-        private int GetNewId()
-        {
-            if (!allData.Any())
-                return 1;
-
-            return allData.Max(x => x.Id) + 1;
         }
 
         /// <summary>
@@ -390,8 +258,6 @@ namespace PublicationPlanning.Repositories
                 return "jpg";
             else if (imageRef.ToLower().EndsWith("png"))
                 return "png";
-            else if (imageRef.ToLower().EndsWith("gif"))
-                return "gif";
             else
                 throw new ArgumentException("Extension of picture is not supported");
         }

@@ -240,6 +240,8 @@ namespace PublicationPlanning
             FlexLayout.SetOrder(frame, imageInfo.Order);
 
             flexLayoutCells.Add((imageInfo.Order, imageInfo.Id, frame));
+
+            pnlEmpty.IsVisible = false;
         }
 
         #region DragDropContext
