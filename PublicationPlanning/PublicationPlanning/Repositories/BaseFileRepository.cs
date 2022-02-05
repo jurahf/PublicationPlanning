@@ -1,4 +1,5 @@
-﻿using PublicationPlanning.StoredModels;
+﻿using Newtonsoft.Json;
+using PublicationPlanning.StoredModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,10 +32,21 @@ namespace PublicationPlanning.Repositories
             LoadAllData();
         }
 
-        protected abstract T ConvertToEntity(string line);
+        protected virtual List<T> ConvertToEntityList(string stringData)
+        {
+            if (string.IsNullOrEmpty(stringData))
+                return new List<T>();
 
-        protected abstract string ConvertToText(T entity);
+            return JsonConvert.DeserializeObject<List<T>>(stringData);
+        }
 
+        protected virtual string ConvertToText(List<T> entityList)
+        {
+            if (entityList == null || !entityList.Any())
+                return "";
+
+            return JsonConvert.SerializeObject(entityList);
+        }
 
         private void LoadAllData()
         {
@@ -44,23 +56,18 @@ namespace PublicationPlanning.Repositories
 
                 if (!storageFiles.Any())
                 {
-                    //CreateStorageFile();
                     allData = new List<T>();
                     return;
                 }
 
                 string lastFile = storageFiles.Max();
-                string[] lines;
+                string stringData;
                 lock (lockObject)
                 {
-                    lines = File.ReadAllLines(lastFile);
+                    stringData = File.ReadAllText(lastFile);
                 }
 
-                allData = new List<T>();
-                foreach (var line in lines)
-                {
-                    allData.Add(ConvertToEntity(line));
-                }
+                allData = ConvertToEntityList(stringData);
             }
             catch (Exception ex)
             {
@@ -99,8 +106,8 @@ namespace PublicationPlanning.Repositories
                 lock (lockObject)
                 {
                     string fileName = Path.Combine(basePath, string.Format(storageFileNameFormat, DateTime.Now));
-                    List<string> lines = allData.Select(x => ConvertToText(x)).ToList();
-                    File.WriteAllLines(fileName, lines);
+                    string stringData = ConvertToText(allData);
+                    File.WriteAllText(fileName, stringData);
                 }
             }
             catch (Exception ex)

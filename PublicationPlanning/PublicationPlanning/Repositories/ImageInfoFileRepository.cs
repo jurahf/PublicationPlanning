@@ -1,4 +1,5 @@
-﻿using PublicationPlanning.ImageResizer;
+﻿using Newtonsoft.Json;
+using PublicationPlanning.ImageResizer;
 using PublicationPlanning.Settings;
 using PublicationPlanning.StoredModels;
 using System;
@@ -34,58 +35,57 @@ namespace PublicationPlanning.Repositories
             // TODO: метод для проверки кэша картинок и удаления ненужных, удаления не новейших версий файла
         }
 
-        protected override ImageInfo ConvertToEntity(string line)
+        protected override List<ImageInfo> ConvertToEntityList(string stringData)
         {
-            string[] fields = line.Split(new string[] { fieldSeparator }, StringSplitOptions.None);
+            if (string.IsNullOrEmpty(stringData))
+                return new List<ImageInfo>();
 
-            if (fields.Length != fieldsCount)
-                throw new ArgumentException("Unexpected data length");
-
-            if (!int.TryParse(fields[0], out int id))
-                throw new ArgumentException($"File position 0 (id): expected a number");
-
-            if (id <= 0)
-                throw new ArgumentException("Id must be a positive number");
-
-            if (!int.TryParse(fields[1], out int order))
-                throw new ArgumentException("File position 1 (order): expected a number");
-
-            if (!int.TryParse(fields[2], out int sourceTypeInt))
-                throw new ArgumentException("File position 2 (source type): expected a number");
-
-            ImageSourceType sourceType = (ImageSourceType)sourceTypeInt;
-
-            string imageRef = fields[3];
-
-            if (string.IsNullOrEmpty(imageRef))
-                throw new ArgumentException("Image ref is not declared");
-
-            return new ImageInfo()
+            if (stringData.StartsWith("["))
             {
-                Id = id,
-                Order = order,
-                SourceType = sourceType,
-                ImageRef = imageRef,
-            };
-        }
+                return base.ConvertToEntityList(stringData);
+            }
+            else
+            {
+                List<ImageInfo> result = new List<ImageInfo>();
+                string[] lines = stringData.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
-        protected override string ConvertToText(ImageInfo entity)
-        {
-            if (entity.Id <= 0)
-                throw new ArgumentException("Entity must have a positive id");
+                foreach (var line in lines)
+                {
+                    string[] fields = line.Split(new string[] { fieldSeparator }, StringSplitOptions.None);
 
-            if (string.IsNullOrEmpty(entity.ImageRef))
-                throw new ArgumentException("Image ref is not declared");
+                    if (fields.Length != fieldsCount)
+                        throw new ArgumentException("Unexpected data length");
 
-            string[] fields = new string[4]
-            { 
-                entity.Id.ToString(),
-                entity.Order.ToString(),
-                ((int)entity.SourceType).ToString(),
-                entity.ImageRef
-            };
+                    if (!int.TryParse(fields[0], out int id))
+                        throw new ArgumentException($"File position 0 (id): expected a number");
 
-            return string.Join(fieldSeparator, fields);
+                    if (id <= 0)
+                        throw new ArgumentException("Id must be a positive number");
+
+                    if (!int.TryParse(fields[1], out int order))
+                        throw new ArgumentException("File position 1 (order): expected a number");
+
+                    if (!int.TryParse(fields[2], out int sourceTypeInt))
+                        throw new ArgumentException("File position 2 (source type): expected a number");
+
+                    ImageSourceType sourceType = (ImageSourceType)sourceTypeInt;
+
+                    string imageRef = fields[3];
+
+                    if (string.IsNullOrEmpty(imageRef))
+                        throw new ArgumentException("Image ref is not declared");
+
+                    result.Add(new ImageInfo()
+                    {
+                        Id = id,
+                        Order = order,
+                        SourceType = sourceType,
+                        ImageRef = imageRef,
+                    });
+                }
+
+                return result;
+            }
         }
 
         public Task<IEnumerable<ImageInfo>> GetByOrders(int startOrder, int endOrder)
