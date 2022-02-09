@@ -28,7 +28,7 @@ namespace PublicationPlanning
         public MainPage(IImageInfoService service)
         {
             this.service = service;
-
+            
             InitializeComponent();
 
             //new TestPictures(service).LoadTestDataToStorage();
@@ -36,6 +36,16 @@ namespace PublicationPlanning
             ShowImages();
 
             this.SizeChanged += async (s, a) => await ShowImages();
+        }
+
+        private async void btnSettings_Clicked(object sender, EventArgs e)
+        {
+            await this.Navigation.PushAsync(new SettingsPage());
+        }
+
+        private async void btnInfo_Clicked(object sender, EventArgs e)
+        {
+            await this.Navigation.PushAsync(new AboutPage());
         }
 
         private async void btnAddPhoto_Clicked(object sender, EventArgs e)

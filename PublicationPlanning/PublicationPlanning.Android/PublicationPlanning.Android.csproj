@@ -94,7 +94,9 @@
     <AndroidResource Include="Resources\mipmap-xxxhdpi\icon.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\launcher_foreground.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\settings.png" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PublicationPlanning\PublicationPlanning.csproj">
       <Project>{20E32739-0953-41AF-BB29-78CFDDCD7002}</Project>
@@ -107,10 +109,13 @@
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\remove.png" />
   </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\info.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties XamarinHotReloadDebuggerTimeoutExceptionPublicationPlanningAndroidHideInfoBar="True" XamarinHotReloadDebuggerTimeoutExceptionSampleMobileAppAndroidHideInfoBar="True" />
+      <UserProperties XamarinHotReloadDebuggerTimeoutExceptionSampleMobileAppAndroidHideInfoBar="True" XamarinHotReloadDebuggerTimeoutExceptionPublicationPlanningAndroidHideInfoBar="True" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

@@ -21,7 +21,11 @@ namespace PublicationPlanning
 
             SetupServices(services);
 
-            MainPage = new MainPage(serviceProvider.GetService<IImageInfoService>());
+            var navigationPage = new NavigationPage(new MainPage(serviceProvider.GetService<IImageInfoService>()));
+            navigationPage.BarBackgroundColor = Color.FromHex("2196F3");
+            navigationPage.BarTextColor = Color.White;
+
+            MainPage = navigationPage;
         }
 
         void SetupServices(ServiceCollection services)

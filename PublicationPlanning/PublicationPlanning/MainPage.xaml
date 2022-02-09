@@ -1,15 +1,35 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="PublicationPlanning.MainPage">
+             x:Class="PublicationPlanning.MainPage"
+             Title="Publication planning">
 
-    <StackLayout>
-        <Frame BackgroundColor="#2196F3" Padding="24" CornerRadius="0">
-            <Label Text="Publication planning" LineBreakMode="NoWrap" HorizontalTextAlignment="Center" TextColor="White" FontSize="32"/>
-        </Frame>
-
+    <StackLayout Margin="0, 10, 0, 0">
+        <!-- кнопки настроек -->
+        <StackLayout Orientation="Horizontal" HorizontalOptions="EndAndExpand">
+            <ImageButton 
+                Source="info.png" 
+                HeightRequest="25" 
+                BackgroundColor="Transparent"
+                Margin="0, 0, 5, 0"
+                Clicked="btnInfo_Clicked"/>
+            <ImageButton 
+                Source="settings.png" 
+                HeightRequest="25" 
+                BackgroundColor="Transparent"
+                Margin="0, 0, 10, 0"
+                Clicked="btnSettings_Clicked"/>
+        </StackLayout>
+        
+        <!-- кнопки действий с картинками -->
         <StackLayout Orientation="Horizontal">
-            <Button Margin="10, 0, 0, 0" Text="Add photo" Clicked="btnAddPhoto_Clicked" BackgroundColor="DarkSeaGreen"></Button>
+            <Button 
+                Margin="10, 0, 0, 0" 
+                Text="Add photo"
+                Clicked="btnAddPhoto_Clicked"
+                BackgroundColor="DarkSeaGreen"
+                Padding="20, 0, 20, 0">                
+            </Button>
             <ImageButton 
                 HorizontalOptions="Center" 
                 VerticalOptions="Center" 
@@ -28,6 +48,7 @@
                 Clicked="btnRemove_Clicked"></ImageButton>            
         </StackLayout>
 
+        <!-- основное содержимое - сетка с картинками -->
         <ScrollView Orientation="Vertical">            
             <FlexLayout x:Name="flexLayout"
                         Wrap="Wrap" 
@@ -37,6 +58,7 @@
             </FlexLayout>
         </ScrollView>
 
+        <!-- на случай отсутствия картинок -->
         <StackLayout x:Name="pnlEmpty" Orientation="Vertical" Margin="30" IsVisible="false">
             <Label HorizontalTextAlignment="Center" FontSize="Large">
                 This is where your photos will be displayed.
@@ -46,6 +68,7 @@
             </Label>
         </StackLayout>
 
+        <!-- на случай загрузки данных -->
         <ActivityIndicator x:Name="activityIndicator"
                            IsRunning="False"
                            VerticalOptions="Center"
