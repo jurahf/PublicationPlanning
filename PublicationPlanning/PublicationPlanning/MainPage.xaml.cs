@@ -22,12 +22,13 @@ namespace PublicationPlanning
     public partial class MainPage : ContentPage, ISelectImageContext, IDragDropContext
     {
         private readonly IImageInfoService service;
-        private const int spacePixel = 2;
+        private readonly SettingsViewModel settings;
         List<(int order, int modelId, View view)> flexLayoutCells = new List<(int, int, View)>();
 
-        public MainPage(IImageInfoService service)
+        public MainPage(IImageInfoService service, ISettingsService settingsService)
         {
             this.service = service;
+            this.settings = settingsService.GetByUserId(0);
             
             InitializeComponent();
 
@@ -118,7 +119,7 @@ namespace PublicationPlanning
             {
                 flexLayout.Children.Clear();
                 flexLayoutCells.Clear();
-                var allImages = await service.GetPage(0, 100);
+                var allImages = await service.GetPage(0, settings.PageSize);
 
                 foreach (var image in allImages.OrderBy(x => x.Order))
                 {
@@ -142,7 +143,7 @@ namespace PublicationPlanning
             double widthBase = 
                 Application.Current?.MainPage?.Width 
                 ?? (DeviceDisplay.MainDisplayInfo.Width / DeviceDisplay.MainDisplayInfo.Density);
-            int imageSizeRequest = (int)(widthBase * 0.33) - (spacePixel * 2) + 1;
+            int imageSizeRequest = (int)(widthBase * (1f / settings.ColumnsCount)) - (settings.ImageSpacingPixels * 2) + 1;
 
             // картинка
             Image image = new Image
@@ -245,7 +246,7 @@ namespace PublicationPlanning
                 });
 
             flexLayout.Children.Add(frame);
-            FlexLayout.SetBasis(frame, new FlexBasis(0.33f, true));
+            FlexLayout.SetBasis(frame, new FlexBasis(1f / settings.ColumnsCount, true));
 
             FlexLayout.SetOrder(frame, imageInfo.Order);
 
@@ -410,7 +411,7 @@ namespace PublicationPlanning
 
             frame.BorderColor = Color.Red;
             frame.BackgroundColor = Color.Red;
-            frame.Padding = new Thickness(spacePixel);
+            frame.Padding = new Thickness(settings.ImageSpacingPixels);
             frame.Margin = new Thickness(0);
         }
 
@@ -421,7 +422,7 @@ namespace PublicationPlanning
 
             frame.BorderColor = Color.Default;
             frame.BackgroundColor = Color.Default;
-            frame.Margin = new Thickness(spacePixel);
+            frame.Margin = new Thickness(settings.ImageSpacingPixels);
             frame.Padding = new Thickness(0);
         }
 

@@ -1,13 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
+using Xamarin.Forms;
 using PublicationPlanning.Converters;
 using PublicationPlanning.Repositories;
 using PublicationPlanning.Services;
-using PublicationPlanning.Settings;
 using PublicationPlanning.StoredModels;
 using PublicationPlanning.ViewModels;
-using System;
-using Xamarin.Forms;
-//using Xamarin.Forms.Xaml;
+
 
 namespace PublicationPlanning
 {
@@ -21,7 +20,12 @@ namespace PublicationPlanning
 
             SetupServices(services);
 
-            var navigationPage = new NavigationPage(new MainPage(serviceProvider.GetService<IImageInfoService>()));
+            var navigationPage = new NavigationPage(
+                new MainPage(
+                    serviceProvider.GetService<IImageInfoService>(),
+                    serviceProvider.GetService<ISettingsService>()
+                    ));
+
             navigationPage.BarBackgroundColor = Color.FromHex("2196F3");
             navigationPage.BarTextColor = Color.White;
 
@@ -30,7 +34,10 @@ namespace PublicationPlanning
 
         void SetupServices(ServiceCollection services)
         {
-            services.AddSingleton<ISettings, DefaultSettings>();
+            services.AddSingleton<IEntityConverter<Settings, SettingsViewModel>, SettingsConverter>();
+            services.AddSingleton<ISettingsRepository, SettingsFileRepository>();
+            services.AddSingleton<ISettingsService, SettingsService>();
+
             services.AddSingleton<IEntityConverter<ImageInfo, ImageInfoViewModel>, ImageInfoConverter>();
             services.AddSingleton<IImageInfoRepository, ImageInfoFileRepository>();
             services.AddSingleton<IImageInfoService, ImageInfoService>();

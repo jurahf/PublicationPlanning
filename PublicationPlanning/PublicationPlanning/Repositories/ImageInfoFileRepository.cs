@@ -1,8 +1,4 @@
-﻿using Newtonsoft.Json;
-using PublicationPlanning.ImageResizer;
-using PublicationPlanning.Settings;
-using PublicationPlanning.StoredModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,6 +6,9 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using PublicationPlanning.ImageResizer;
+using PublicationPlanning.StoredModels;
 
 namespace PublicationPlanning.Repositories
 {
@@ -23,13 +22,13 @@ namespace PublicationPlanning.Repositories
         private const string fieldSeparator = "\t";
         private const int fieldsCount = 4;        
         private readonly IImageResizer imageResizer;
-        private readonly ISettings settings;
+        private readonly Settings settings;
 
-        public ImageInfoFileRepository(IImageResizer imageResizer, ISettings settings)
+        public ImageInfoFileRepository(IImageResizer imageResizer, ISettingsRepository settingsRepository)
             : base()
         {
             this.imageResizer = imageResizer;
-            this.settings = settings;
+            this.settings = settingsRepository.GetByUserId(0);
             
 
             // TODO: метод для проверки кэша картинок и удаления ненужных, удаления не новейших версий файла

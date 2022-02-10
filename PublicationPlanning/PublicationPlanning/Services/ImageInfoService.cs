@@ -20,14 +20,14 @@ namespace PublicationPlanning.Services
 
     public class ImageInfoService : BaseEntityService<ImageInfo, ImageInfoViewModel>, IImageInfoService
     {
-        private readonly IImageInfoRepository repository;
+        private readonly IImageInfoRepository imageRepository;
 
         public ImageInfoService(
             IImageInfoRepository repository,
             IEntityConverter<ImageInfo, ImageInfoViewModel> converter)
             : base(repository, converter)
         {
-            this.repository = repository;
+            this.imageRepository = repository;
         }
 
         public async Task<int> InsertFirst(ImageInfoViewModel entity)
@@ -43,7 +43,7 @@ namespace PublicationPlanning.Services
             int oldOrder = entity.Order;
 
             List<ImageInfo> imageList = 
-                (await repository.GetByOrders(Math.Min(oldOrder, newOrder), Math.Max(oldOrder, newOrder)))
+                (await imageRepository.GetByOrders(Math.Min(oldOrder, newOrder), Math.Max(oldOrder, newOrder)))
                 .ToList();
 
             int moveDirection = oldOrder < newOrder ? -1 : 1;
