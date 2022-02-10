@@ -18,13 +18,11 @@ namespace PublicationPlanning.Droid
 {
     public class ImageResizer : IImageResizer
     {
-        private const int quality = 80;
-
         public ImageResizer()
         {
         }
 
-        public async Task<byte[]> ResizeImage(byte[] imageData, int width, int height, ImageFormat format)
+        public async Task<byte[]> ResizeImage(byte[] imageData, int width, int height, ImageFormat format, int quality)
         {
             if (imageData == null || !imageData.Any())
                 return new byte[0];

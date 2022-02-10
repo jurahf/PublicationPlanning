@@ -12,7 +12,7 @@ namespace PublicationPlanning.iOS
 {
     public class ImageResizer : IImageResizer
     {
-        public async Task<byte[]> ResizeImage(byte[] imageData, int width, int height, ImageFormat format)
+        public async Task<byte[]> ResizeImage(byte[] imageData, int width, int height, ImageFormat format, int quality)
         {
             if (imageData == null || !imageData.Any())
                 return new byte[0];
@@ -50,7 +50,7 @@ namespace PublicationPlanning.iOS
             UIGraphics.EndImageContext();
 
             byte[] bytesImagen = format == ImageFormat.JPEG
-                ? resizedImage.AsJPEG().ToArray()
+                ? resizedImage.AsJPEG(quality / 100f).ToArray()
                 : resizedImage.AsPNG().ToArray();
 
             resizedImage.Dispose();

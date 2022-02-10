@@ -189,7 +189,7 @@ namespace PublicationPlanning.Repositories
                 if (settings.ResizeImages)
                 {
                     byte[] bytes = File.ReadAllBytes(entity.ImageRef);
-                    byte[] resizedBytes = await imageResizer.ResizeImage(bytes, settings.ImageResizeWidth, settings.ImageResizeHeight, format);
+                    byte[] resizedBytes = await imageResizer.ResizeImage(bytes, settings.ImageResizeWidth, settings.ImageResizeHeight, format, settings.ImageCompressQuality);
                     File.WriteAllBytes(filePath, resizedBytes);
                 }
                 else
@@ -216,7 +216,7 @@ namespace PublicationPlanning.Repositories
 
                         if (settings.ResizeImages)
                         {
-                            byte[] resizedBytes = await imageResizer.ResizeImage(data, settings.ImageResizeWidth, settings.ImageResizeHeight, format);
+                            byte[] resizedBytes = await imageResizer.ResizeImage(data, settings.ImageResizeWidth, settings.ImageResizeHeight, format, settings.ImageCompressQuality);
                             File.WriteAllBytes(filePath, resizedBytes);
                         }
                         else

@@ -46,6 +46,7 @@ namespace PublicationPlanning.Services
                 ColumnsCount = 3,
                 PageSize = 100,
                 ImageSpacingPixels = 2,
+                ImageCompressQuality = 80,
             };
         }
 

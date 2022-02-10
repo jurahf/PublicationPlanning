@@ -22,12 +22,14 @@ namespace PublicationPlanning
     public partial class MainPage : ContentPage, ISelectImageContext, IDragDropContext
     {
         private readonly IImageInfoService service;
-        private readonly SettingsViewModel settings;
+        private readonly ISettingsService settingsService;
+        private SettingsViewModel settings;
         List<(int order, int modelId, View view)> flexLayoutCells = new List<(int, int, View)>();
 
         public MainPage(IImageInfoService service, ISettingsService settingsService)
         {
             this.service = service;
+            this.settingsService = settingsService;
             this.settings = settingsService.GetByUserId(0);
             
             InitializeComponent();
@@ -41,7 +43,14 @@ namespace PublicationPlanning
 
         private async void btnSettings_Clicked(object sender, EventArgs e)
         {
-            await this.Navigation.PushAsync(new SettingsPage());
+            var settingsPage = new SettingsPage(settingsService);
+            settingsPage.Disappearing += async (s, a) => 
+            { 
+                settings = settingsService.GetByUserId(0);
+                await ShowImages();
+            };
+
+            await this.Navigation.PushAsync(settingsPage);            
         }
 
         private async void btnInfo_Clicked(object sender, EventArgs e)

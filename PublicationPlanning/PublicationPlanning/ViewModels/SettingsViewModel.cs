@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace PublicationPlanning.ViewModels
@@ -22,6 +23,11 @@ namespace PublicationPlanning.ViewModels
         /// Задает высоту для преобразования картинок, используется, если включена настройка изменения размера картинок для хранения
         /// </summary>
         public int ImageResizeHeight { get; set; }
+
+        /// <summary>
+        /// Качество картинок при сжатии от 0 до 100
+        /// </summary>
+        public int ImageCompressQuality { get; set; }
 
         /// <summary>
         /// Сколько картинок загружать при постраничной загрузке

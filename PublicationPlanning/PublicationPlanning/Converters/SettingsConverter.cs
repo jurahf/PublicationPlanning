@@ -22,6 +22,7 @@ namespace PublicationPlanning.Converters
                 ResizeImages = view.ResizeImages,
                 ImageResizeHeight = view.ImageResizeHeight,
                 ImageResizeWidth = view.ImageResizeWidth,
+                ImageCompressQuality = view.ImageCompressQuality,
             };
         }
 
@@ -39,6 +40,7 @@ namespace PublicationPlanning.Converters
                 ResizeImages = stored.ResizeImages,
                 ImageResizeHeight = stored.ImageResizeHeight,
                 ImageResizeWidth = stored.ImageResizeWidth,
+                ImageCompressQuality = stored.ImageCompressQuality,
             };
         }
 

@@ -29,6 +29,11 @@ namespace PublicationPlanning.StoredModels
         public int ImageResizeHeight { get; set; }
 
         /// <summary>
+        /// Качество картинок при сжатии от 0 до 100
+        /// </summary>
+        public int ImageCompressQuality { get; set; }
+
+        /// <summary>
         /// Сколько картинок загружать при постраничной загрузке
         /// </summary>
         public int PageSize { get; set; }

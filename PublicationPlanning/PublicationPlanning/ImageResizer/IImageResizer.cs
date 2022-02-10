@@ -7,6 +7,6 @@ namespace PublicationPlanning.ImageResizer
 {
     public interface IImageResizer
     {
-        Task<byte[]> ResizeImage(byte[] imageData, int width, int height, ImageFormat format);
+        Task<byte[]> ResizeImage(byte[] imageData, int width, int height, ImageFormat format, int quality);
     }
 }
