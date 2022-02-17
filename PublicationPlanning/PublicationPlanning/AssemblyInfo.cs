@@ -1,7 +1,10 @@
 using Android.App;
+using System.Resources;
 using Xamarin.Forms.Xaml;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
+
+[assembly: NeutralResourcesLanguage("en-US")]
 
 // Needed for Picking photo/video
 [assembly: UsesPermission(Android.Manifest.Permission.ReadExternalStorage)]

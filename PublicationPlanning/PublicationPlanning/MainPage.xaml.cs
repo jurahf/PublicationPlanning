@@ -72,8 +72,8 @@ namespace PublicationPlanning
         {
             if (selectedImage == null)
                 return;
-
-            bool approve = await DisplayAlert("Delete", "Delete this image?", "Delete", "Cancel");
+            
+            bool approve = await DisplayAlert(AppResources.Deleting, AppResources.DeleteThisImage, AppResources.Delete, AppResources.Cancel);
 
             if (!approve)
                 return;
@@ -113,7 +113,7 @@ namespace PublicationPlanning
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Error", ex.Message, "Close");
+                await DisplayAlert(AppResources.Error, ex.Message, AppResources.Close);
             }
         }
 

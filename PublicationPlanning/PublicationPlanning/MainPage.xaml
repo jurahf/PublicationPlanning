@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PublicationPlanning.MainPage"
-             Title="Publication planning">
+             Title="Publication planning"
+             xmlns:resources="clr-namespace:PublicationPlanning">
 
     <StackLayout Margin="0, 10, 0, 0">
         <!-- кнопки настроек -->
@@ -25,7 +26,7 @@
         <StackLayout Orientation="Horizontal">
             <Button 
                 Margin="10, 0, 0, 0" 
-                Text="Add photo"
+                Text="{x:Static resources:AppResources.AddPhoto}"
                 Clicked="btnAddPhoto_Clicked"
                 BackgroundColor="DarkSeaGreen"
                 Padding="20, 0, 20, 0">                
@@ -60,12 +61,8 @@
 
         <!-- на случай отсутствия картинок -->
         <StackLayout x:Name="pnlEmpty" Orientation="Vertical" Margin="30" IsVisible="false">
-            <Label HorizontalTextAlignment="Center" FontSize="Large">
-                This is where your photos will be displayed.
-            </Label>
-            <Label HorizontalTextAlignment="Center" FontSize="Large">
-                Add them using the button above.
-            </Label>
+            <Label HorizontalTextAlignment="Center" FontSize="Large" Text="{x:Static resources:AppResources.IsWhereYourPhotos}" />
+            <Label HorizontalTextAlignment="Center" FontSize="Large" Text="{x:Static resources:AppResources.UsingButtonAbove}"/>
         </StackLayout>
 
         <!-- на случай загрузки данных -->

@@ -3,38 +3,39 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PublicationPlanning.SettingsPage"
              Title="Publication planning"
-             x:Name="SettingsPageInstance">
+             x:Name="SettingsPageInstance"
+             xmlns:resources="clr-namespace:PublicationPlanning">
     <ContentPage.Content>
         <StackLayout BindingContext="{Binding Source={x:Reference SettingsPageInstance}}"
                      Padding="20"
                      VerticalOptions="Start">
 
-            <Label FontSize="18" Text="{Binding PageSize, StringFormat='Images per page: {0}'}" />
+            <Label FontSize="18" Text="{Binding PageSize, StringFormat={x:Static resources:AppResources.ImagesPerPageFormat}}" />
             <Slider Value="{Binding PageSize, Mode=TwoWay}" Maximum="500" Minimum="10" MinimumTrackColor="#2196F3" MaximumTrackColor="Gray" ThumbColor="#2196F3" />
 
-            <Label Margin="0, 20, 0, 0" FontSize="18" Text="{Binding ImageSpacingPixels, StringFormat='Image spacing: {0}'}" />
+            <Label Margin="0, 20, 0, 0" FontSize="18" Text="{Binding ImageSpacingPixels, StringFormat={x:Static resources:AppResources.ImageSpacingFormat}}" />
             <Slider Value="{Binding ImageSpacingPixels, Mode=TwoWay}" Maximum="10" Minimum="0" MinimumTrackColor="#2196F3" MaximumTrackColor="Gray" ThumbColor="#2196F3" />
 
-            <Label Margin="0, 20, 0, 0" FontSize="18" Text="{Binding ImageCompressQuality, StringFormat='Image compress quality: {0}%'}" />
+            <Label Margin="0, 20, 0, 0" FontSize="18" Text="{Binding ImageCompressQuality, StringFormat={x:Static resources:AppResources.ImageCompressQualityFormat}}" />
             <Slider Value="{Binding ImageCompressQuality, Mode=TwoWay}" Maximum="100" Minimum="0" MinimumTrackColor="#2196F3" MaximumTrackColor="Gray" ThumbColor="#2196F3" />
 
             <StackLayout Margin="0, 20, 0, 0" Orientation="Horizontal">
                 <Label 
                     FontSize="18"
-                    Text="Use image resizing for storage"/>
+                    Text="{x:Static resources:AppResources.UseImageResizingForStorage}"/>
                 <Switch HorizontalOptions="Start" IsToggled="{Binding UseImageResize, Mode=TwoWay}" OnColor="#2196F3" ThumbColor="#2196F3" />
             </StackLayout>
             <Frame BorderColor="LightGray" BackgroundColor="Transparent" IsVisible="{Binding UseImageResize}">
                 <StackLayout>
-                    <Label FontSize="18" Text="{Binding ImageResizeWidth, StringFormat='Width in storage: {0}'}" />
+                    <Label FontSize="18" Text="{Binding ImageResizeWidth, StringFormat={x:Static resources:AppResources.WidthInStorageFormat}}" />
                     <Slider Value="{Binding ImageResizeWidth, Mode=TwoWay}" Maximum="2000" Minimum="128" MinimumTrackColor="#2196F3" MaximumTrackColor="Gray" ThumbColor="#2196F3" />
-                    
-                    <Label FontSize="18" Text="{Binding ImageResizeHeight, StringFormat='Height in storage: {0}'}" />
+
+                    <Label FontSize="18" Text="{Binding ImageResizeHeight, StringFormat={x:Static resources:AppResources.HeightInStorageFormat}}" />
                     <Slider Value="{Binding ImageResizeHeight, Mode=TwoWay}" Maximum="2000" Minimum="128" MinimumTrackColor="#2196F3" MaximumTrackColor="Gray" ThumbColor="#2196F3" />
                 </StackLayout>
             </Frame>
-            
-            <Label Margin="0, 20, 0, 0" FontSize="18" Text="{Binding ColumnsCount, StringFormat='Columns count: {0}'}"/>
+
+            <Label Margin="0, 20, 0, 0" FontSize="18" Text="{Binding ColumnsCount, StringFormat={x:Static resources:AppResources.ColumnsCountFormat}}"/>
             <Slider Value="{Binding ColumnsCount, Mode=TwoWay}" Maximum="10" Minimum="1" MinimumTrackColor="#2196F3" MaximumTrackColor="Gray" ThumbColor="#2196F3" />
             
         </StackLayout>

@@ -17,7 +17,7 @@ namespace PublicationPlanning
             InitializeComponent();
 
             VersionTracking.Track();
-            lblData.Text = $"Publication Planning{Environment.NewLine}Version: {VersionTracking.CurrentVersion}, build: {VersionTracking.CurrentBuild}{Environment.NewLine} by Jurahf.";
+            lblData.Text = $"{AppResources.PublicationPlanning}{Environment.NewLine}{AppResources.Version}: {VersionTracking.CurrentVersion}, {AppResources.build}: {VersionTracking.CurrentBuild}{Environment.NewLine} {AppResources.byJurahf}.";
         }
     }
 }
