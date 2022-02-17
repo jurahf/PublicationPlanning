@@ -30,24 +30,7 @@ namespace PublicationPlanning.Services
         {
             Settings settings = settingsRepository.GetByUserId(userId);
 
-            if (settings == null)
-                return converter.ConvertToViewModel(GetDefaultSettings());
-            else
-                return converter.ConvertToViewModel(settings);
-        }
-
-        private Settings GetDefaultSettings()
-        {
-            return new Settings()
-            {
-                ResizeImages = true,
-                ImageResizeWidth = 800,
-                ImageResizeHeight = 800,
-                ColumnsCount = 3,
-                PageSize = 100,
-                ImageSpacingPixels = 2,
-                ImageCompressQuality = 80,
-            };
+            return converter.ConvertToViewModel(settings);
         }
 
     }

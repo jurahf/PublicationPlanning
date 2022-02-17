@@ -22,13 +22,13 @@ namespace PublicationPlanning.Repositories
         private const string fieldSeparator = "\t";
         private const int fieldsCount = 4;        
         private readonly IImageResizer imageResizer;
-        private readonly Settings settings;
+        private readonly ISettingsRepository settingsRepository;
 
         public ImageInfoFileRepository(IImageResizer imageResizer, ISettingsRepository settingsRepository)
             : base()
         {
             this.imageResizer = imageResizer;
-            this.settings = settingsRepository.GetByUserId(0);
+            this.settingsRepository = settingsRepository;
             
 
             // TODO: метод для проверки кэша картинок и удаления ненужных, удаления не новейших версий файла
@@ -173,6 +173,7 @@ namespace PublicationPlanning.Repositories
         /// <param name="entity"></param>
         private async Task<string> CheckAndCacheImage(ImageInfo entity)
         {
+            Settings settings = settingsRepository.GetByUserId(0);  // TODO: пока только 1 пользователь
             bool isLocal = entity.ImageRef.StartsWith(basePath);
 
             if (isLocal)

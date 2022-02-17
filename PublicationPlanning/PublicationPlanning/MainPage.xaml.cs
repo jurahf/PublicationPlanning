@@ -113,7 +113,7 @@ namespace PublicationPlanning
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Ошибка", ex.Message, "Close");
+                await DisplayAlert("Error", ex.Message, "Close");
             }
         }
 

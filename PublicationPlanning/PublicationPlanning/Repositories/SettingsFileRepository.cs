@@ -17,7 +17,21 @@ namespace PublicationPlanning.Repositories
         public Settings GetByUserId(int userId)
         {
             // TODO: пока user и userId нет в модели. Этот метод надо изменить, когда появится авторизация
-            return allData.FirstOrDefault();
+            return allData.FirstOrDefault() ?? GetDefaultSettings();
+        }
+
+        private Settings GetDefaultSettings()
+        {
+            return new Settings()
+            {
+                ResizeImages = true,
+                ImageResizeWidth = 800,
+                ImageResizeHeight = 800,
+                ColumnsCount = 3,
+                PageSize = 100,
+                ImageSpacingPixels = 2,
+                ImageCompressQuality = 80,
+            };
         }
     }
 }
