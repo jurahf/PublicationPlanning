@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ImageResizer.cs" />
+    <Compile Include="ImageRotator.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -117,11 +118,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="PrivacyPolicy.html" />
+    <AndroidResource Include="Resources\drawable\rotateRight.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties XamarinHotReloadDebuggerTimeoutExceptionSampleMobileAppAndroidHideInfoBar="True" XamarinHotReloadDebuggerTimeoutExceptionPublicationPlanningAndroidHideInfoBar="True" />
+      <UserProperties XamarinHotReloadDebuggerTimeoutExceptionPublicationPlanningAndroidHideInfoBar="True" XamarinHotReloadDebuggerTimeoutExceptionSampleMobileAppAndroidHideInfoBar="True" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

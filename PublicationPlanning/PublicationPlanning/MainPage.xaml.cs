@@ -68,6 +68,23 @@ namespace PublicationPlanning
             await ShowImages();
         }
 
+        private async void btnRotateRight_Clicked(object sender, EventArgs e)
+        {
+            if (selectedImage == null)
+                return;
+
+            await service.RotateImage(selectedImage.ImageInfoId, 90);
+
+            // иначе не придумал как перерисовать картинку
+            Image imageControl = FindImageControl(selectedImage.Control);
+            if (imageControl != null)
+            {
+                var src = imageControl.Source;
+                imageControl.Source = null;
+                imageControl.Source = src;
+            }
+        }
+
         private async void btnRemove_Clicked(object sender, EventArgs e)
         {
             if (selectedImage == null)
@@ -264,6 +281,27 @@ namespace PublicationPlanning
             pnlEmpty.IsVisible = false;
         }
 
+        private Image FindImageControl(View parent)
+        {
+            if (parent is Image)
+                return parent as Image;
+
+            if (parent is Frame)
+                return FindImageControl((parent as Frame).Content);
+
+            if (parent is Layout)
+            {
+                foreach (var view in (parent as Layout).Children.OfType<Image>())
+                {
+                    var res = FindImageControl(view);
+                    if (res != null)
+                        return res;
+                }
+            }
+
+            return null;
+        }
+
         #region DragDropContext
 
         private List<DragDropInfo> activeDropLanding = new List<DragDropInfo>();
@@ -387,7 +425,7 @@ namespace PublicationPlanning
         {
             if (selectedImage != null)
             {
-                EnableImageOperationButtons(false);
+                VisibleImageOperationButtons(false);
                 SetUnselectStyle(selectedImage.Control as Frame);
                 selectedImage = null;
             }
@@ -405,7 +443,7 @@ namespace PublicationPlanning
 
             selectedImage = selected;
 
-            EnableImageOperationButtons(true);
+            VisibleImageOperationButtons(true);
         }
 
         public ImageModelAndControl GetSelection()
@@ -435,9 +473,10 @@ namespace PublicationPlanning
             frame.Padding = new Thickness(0);
         }
 
-        private void EnableImageOperationButtons(bool isEnable)
+        private void VisibleImageOperationButtons(bool isVisible)
         {
-            btnRemove.IsEnabled = isEnable;
+            btnRemove.IsVisible = isVisible;
+            btnRotateRight.IsVisible = isVisible;
         }
 
         #endregion

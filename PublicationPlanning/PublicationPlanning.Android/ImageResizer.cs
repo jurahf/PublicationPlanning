@@ -5,14 +5,14 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using PublicationPlanning.ImageResizer;
+using PublicationPlanning.ImageTranslations;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ImageFormat = PublicationPlanning.ImageResizer.ImageFormat;
+using ImageFormat = PublicationPlanning.ImageTranslations.ImageFormat;
 
 namespace PublicationPlanning.Droid
 {

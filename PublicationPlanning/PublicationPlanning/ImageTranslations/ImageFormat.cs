@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace PublicationPlanning.ImageResizer
+namespace PublicationPlanning.ImageTranslations
 {
     public enum ImageFormat
     {

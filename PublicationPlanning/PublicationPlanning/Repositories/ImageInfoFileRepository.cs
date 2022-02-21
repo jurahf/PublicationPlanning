@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using PublicationPlanning.ImageResizer;
+using PublicationPlanning.ImageTranslations;
 using PublicationPlanning.StoredModels;
 
 namespace PublicationPlanning.Repositories
@@ -15,6 +15,8 @@ namespace PublicationPlanning.Repositories
     public interface IImageInfoRepository : IRepository<ImageInfo>
     {
         Task<IEnumerable<ImageInfo>> GetByOrders(int startOrder, int endOrder);
+
+        Task RotateImage(ImageInfo imageInfo, float degrees);
     }
 
     public class ImageInfoFileRepository : BaseFileRepository<ImageInfo>, IImageInfoRepository
@@ -22,12 +24,17 @@ namespace PublicationPlanning.Repositories
         private const string fieldSeparator = "\t";
         private const int fieldsCount = 4;        
         private readonly IImageResizer imageResizer;
+        private readonly IImageRotator imageRotator;
         private readonly ISettingsRepository settingsRepository;
 
-        public ImageInfoFileRepository(IImageResizer imageResizer, ISettingsRepository settingsRepository)
+        public ImageInfoFileRepository(
+            IImageResizer imageResizer,
+            IImageRotator imageRotator, 
+            ISettingsRepository settingsRepository)
             : base()
         {
             this.imageResizer = imageResizer;
+            this.imageRotator = imageRotator;
             this.settingsRepository = settingsRepository;
             
 
@@ -235,6 +242,22 @@ namespace PublicationPlanning.Repositories
             }
 
             return entity.ImageRef;
+        }
+
+        public async Task RotateImage(ImageInfo imageInfo, float degrees)
+        {
+            bool isLocal = imageInfo.ImageRef.StartsWith(basePath);
+
+            if (!isLocal)
+                throw new NotSupportedException();
+
+            string extension = Path.GetExtension(imageInfo.ImageRef);
+            ImageFormat format = ParseImageFormat(extension);
+
+            // lock ?
+            byte[] bytes = File.ReadAllBytes(imageInfo.ImageRef);
+            byte[] rotated = await imageRotator.Rotate(bytes, format, degrees);
+            File.WriteAllBytes(imageInfo.ImageRef, rotated);
         }
 
         private ImageFormat ParseImageFormat(string extension)

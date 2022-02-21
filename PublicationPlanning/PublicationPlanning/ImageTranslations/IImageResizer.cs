@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PublicationPlanning.ImageResizer
+namespace PublicationPlanning.ImageTranslations
 {
     public interface IImageResizer
     {

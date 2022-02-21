@@ -16,6 +16,8 @@ namespace PublicationPlanning.Services
         Task<int> InsertFirst(ImageInfoViewModel entity);
 
         Task MoveOrder(ImageInfoViewModel entity, int newOrder);
+
+        Task RotateImage(int entityId, float degrees);
     }
 
     public class ImageInfoService : BaseEntityService<ImageInfo, ImageInfoViewModel>, IImageInfoService
@@ -61,5 +63,13 @@ namespace PublicationPlanning.Services
                 await repository.Update(image.Id, image);
             }
         }
+
+        public async Task RotateImage(int entityId, float degrees)
+        {
+            ImageInfo entity = await imageRepository.Get(entityId);
+
+            await imageRepository.RotateImage(entity, degrees);
+        }
+
     }
 }

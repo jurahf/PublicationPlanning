@@ -5,7 +5,7 @@ using Android.Content.PM;
 using Android.Runtime;
 using Android.OS;
 using Microsoft.Extensions.DependencyInjection;
-using PublicationPlanning.ImageResizer;
+using PublicationPlanning.ImageTranslations;
 
 namespace PublicationPlanning.Droid
 {
@@ -28,6 +28,7 @@ namespace PublicationPlanning.Droid
         private void ConfigureServicesAndroid(ServiceCollection services)
         {
             services.AddSingleton<IImageResizer, ImageResizer>();
+            services.AddSingleton<IImageRotator, ImageRotator>();
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)

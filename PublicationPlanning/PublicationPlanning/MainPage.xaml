@@ -29,15 +29,26 @@
                 Text="{x:Static resources:AppResources.AddPhoto}"
                 Clicked="btnAddPhoto_Clicked"
                 BackgroundColor="DarkSeaGreen"
-                Padding="20, 0, 20, 0">                
+                Padding="20, 0, 20, 0"
+                HeightRequest="60">
             </Button>
-            <ImageButton 
+            <!--<ImageButton 
                 HorizontalOptions="Center" 
                 VerticalOptions="Center" 
                 Source="refresh.png"
                 HeightRequest="60"
                 Padding="20, 5, 20, 5"
-                Clicked="btnRefresh_Clicked"></ImageButton>
+                Clicked="btnRefresh_Clicked"></ImageButton>-->
+            <ImageButton 
+                x:Name="btnRotateRight"
+                Source="rotateRight.png"
+                HorizontalOptions="Center" 
+                VerticalOptions="Center" 
+                Padding="15, 5, 15, 5"
+                IsVisible="false"                
+                Clicked="btnRotateRight_Clicked"
+                HeightRequest="60">
+            </ImageButton>
             <ImageButton 
                 x:Name="btnRemove"
                 HorizontalOptions="Center" 
@@ -45,7 +56,7 @@
                 Source="remove.png"
                 HeightRequest="60"
                 Padding="15, 5, 15, 5"
-                IsEnabled="false"
+                IsVisible="false"
                 Clicked="btnRemove_Clicked"></ImageButton>            
         </StackLayout>
 
