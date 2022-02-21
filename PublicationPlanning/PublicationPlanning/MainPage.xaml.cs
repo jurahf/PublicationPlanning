@@ -25,6 +25,8 @@ namespace PublicationPlanning
         private readonly ISettingsService settingsService;
         private SettingsViewModel settings;
         List<(int order, int modelId, View view)> flexLayoutCells = new List<(int, int, View)>();
+        private bool hiddingMode = false;
+        List<ImageModelAndControl> hidden = new List<ImageModelAndControl>();
 
         public MainPage(IImageInfoService service, ISettingsService settingsService)
         {
@@ -66,6 +68,36 @@ namespace PublicationPlanning
         private async void btnRefresh_Clicked(object sender, EventArgs e)
         {
             await ShowImages();
+        }
+
+        private void btnHidePhoto_Clicked(object sender, EventArgs e)
+        {
+            if (hiddingMode)
+            {
+                foreach (var view in hidden)
+                {
+                    view.Control.IsVisible = true;
+                }
+
+                hidden.Clear();
+                hiddingMode = false;
+                btnHidePhoto.BackgroundColor = Color.LightGray;
+                btnHidePhoto.BorderColor = Color.LightGray;
+                btnHidePhoto.BorderWidth = 0;
+            }
+            else
+            {
+                if (selectedImage != null)
+                {
+                    HideElement(selectedImage);
+                }
+
+                ClearSelection();
+                hiddingMode = true;
+                btnHidePhoto.BackgroundColor = Color.Gray;
+                btnHidePhoto.BorderColor = Color.Red;
+                btnHidePhoto.BorderWidth = 2;
+            }
         }
 
         private async void btnRotateRight_Clicked(object sender, EventArgs e)
@@ -149,7 +181,13 @@ namespace PublicationPlanning
 
                 foreach (var image in allImages.OrderBy(x => x.Order))
                 {
-                    AddImageToLayout(image);
+                    var view = AddImageToLayout(image);
+
+                    if (hiddingMode && hidden.Any(x => x.ImageInfoId == image.Id))
+                    {
+                        hidden = hidden.Where(x => x.ImageInfoId != image.Id).ToList();
+                        HideElement(new ImageModelAndControl(image.Id, view));
+                    }
                 }
 
                 if (!allImages.Any())
@@ -164,7 +202,7 @@ namespace PublicationPlanning
             }
         }
 
-        private void AddImageToLayout(ImageInfoViewModel imageInfo)
+        private View AddImageToLayout(ImageInfoViewModel imageInfo)
         {
             double widthBase = 
                 Application.Current?.MainPage?.Width 
@@ -279,6 +317,8 @@ namespace PublicationPlanning
             flexLayoutCells.Add((imageInfo.Order, imageInfo.Id, frame));
 
             pnlEmpty.IsVisible = false;
+
+            return frame;
         }
 
         private Image FindImageControl(View parent)
@@ -438,12 +478,27 @@ namespace PublicationPlanning
             if (selected == null)
                 return;
 
-            Frame frame = selected.Control as Frame;
-            SetSelectStyle(frame);
+            if (hiddingMode)
+            {
+                HideElement(selected);
+            }
+            else
+            {
+                Frame frame = selected.Control as Frame;
+                SetSelectStyle(frame);
+                selectedImage = selected;
 
-            selectedImage = selected;
+                VisibleImageOperationButtons(true);
+            }
+        }
 
-            VisibleImageOperationButtons(true);
+        private void HideElement(ImageModelAndControl element)
+        {
+            if (element?.Control == null)
+                return;
+
+            element.Control.IsVisible = false;
+            hidden.Add(element);
         }
 
         public ImageModelAndControl GetSelection()

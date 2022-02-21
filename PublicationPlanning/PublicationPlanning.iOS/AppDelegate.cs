@@ -4,7 +4,7 @@ using System.Linq;
 
 using Foundation;
 using Microsoft.Extensions.DependencyInjection;
-using PublicationPlanning.ImageResizer;
+using PublicationPlanning.ImageTranslations;
 using UIKit;
 
 namespace PublicationPlanning.iOS

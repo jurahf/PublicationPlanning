@@ -32,6 +32,15 @@
                 Padding="20, 0, 20, 0"
                 HeightRequest="60">
             </Button>
+            <ImageButton 
+                x:Name="btnHidePhoto"
+                Source="eyeClosed.png"
+                HorizontalOptions="Center" 
+                VerticalOptions="Center" 
+                Clicked="btnHidePhoto_Clicked"
+                Padding="15, 5, 15, 5"
+                HeightRequest="60">
+            </ImageButton>
             <!--<ImageButton 
                 HorizontalOptions="Center" 
                 VerticalOptions="Center" 
@@ -66,7 +75,8 @@
                         Wrap="Wrap" 
                         JustifyContent="Start" 
                         FlexLayout.Grow="1"
-                        AlignItems="Center">
+                        AlignItems="Center"
+                        AlignContent="Start">
             </FlexLayout>
         </ScrollView>
 

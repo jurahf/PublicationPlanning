@@ -119,6 +119,7 @@
   <ItemGroup>
     <Content Include="PrivacyPolicy.html" />
     <AndroidResource Include="Resources\drawable\rotateRight.png" />
+    <AndroidResource Include="Resources\drawable\eyeClosed.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ProjectExtensions>

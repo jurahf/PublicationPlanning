@@ -1,5 +1,5 @@
 ﻿using Foundation;
-using PublicationPlanning.ImageResizer;
+using PublicationPlanning.ImageTranslations;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
