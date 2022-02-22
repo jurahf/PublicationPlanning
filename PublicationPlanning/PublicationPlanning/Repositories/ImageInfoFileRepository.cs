@@ -21,8 +21,6 @@ namespace PublicationPlanning.Repositories
 
     public class ImageInfoFileRepository : BaseFileRepository<ImageInfo>, IImageInfoRepository
     {
-        private const string fieldSeparator = "\t";
-        private const int fieldsCount = 4;        
         private readonly IImageResizer imageResizer;
         private readonly IImageRotator imageRotator;
         private readonly ISettingsRepository settingsRepository;
@@ -39,59 +37,6 @@ namespace PublicationPlanning.Repositories
             
 
             // TODO: метод для проверки кэша картинок и удаления ненужных, удаления не новейших версий файла
-        }
-
-        protected override List<ImageInfo> ConvertToEntityList(string stringData)
-        {
-            if (string.IsNullOrEmpty(stringData))
-                return new List<ImageInfo>();
-
-            if (stringData.StartsWith("["))
-            {
-                return base.ConvertToEntityList(stringData);
-            }
-            else
-            {
-                List<ImageInfo> result = new List<ImageInfo>();
-                string[] lines = stringData.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-
-                foreach (var line in lines)
-                {
-                    string[] fields = line.Split(new string[] { fieldSeparator }, StringSplitOptions.None);
-
-                    if (fields.Length != fieldsCount)
-                        throw new ArgumentException("Unexpected data length");
-
-                    if (!int.TryParse(fields[0], out int id))
-                        throw new ArgumentException($"File position 0 (id): expected a number");
-
-                    if (id <= 0)
-                        throw new ArgumentException("Id must be a positive number");
-
-                    if (!int.TryParse(fields[1], out int order))
-                        throw new ArgumentException("File position 1 (order): expected a number");
-
-                    if (!int.TryParse(fields[2], out int sourceTypeInt))
-                        throw new ArgumentException("File position 2 (source type): expected a number");
-
-                    ImageSourceType sourceType = (ImageSourceType)sourceTypeInt;
-
-                    string imageRef = fields[3];
-
-                    if (string.IsNullOrEmpty(imageRef))
-                        throw new ArgumentException("Image ref is not declared");
-
-                    result.Add(new ImageInfo()
-                    {
-                        Id = id,
-                        Order = order,
-                        SourceType = sourceType,
-                        ImageRef = imageRef,
-                    });
-                }
-
-                return result;
-            }
         }
 
         public Task<IEnumerable<ImageInfo>> GetByOrders(int startOrder, int endOrder)
