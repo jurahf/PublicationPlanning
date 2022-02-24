@@ -11,24 +11,27 @@ namespace PublicationPlanning.Services
 {
     public interface ISettingsService : IEntityService<SettingsViewModel>
     {
-        SettingsViewModel GetByUserId(int userId);
+        SettingsViewModel GetByFeed(FeedViewModel feed);
     }
 
     public class SettingsService : BaseEntityService<Settings, SettingsViewModel>, ISettingsService
     {
         protected readonly ISettingsRepository settingsRepository;
+        protected readonly IEntityConverter<Feed, FeedViewModel> feedConverter;
 
         public SettingsService(
             ISettingsRepository repository,
-            IEntityConverter<Settings, SettingsViewModel> converter)
+            IEntityConverter<Settings, SettingsViewModel> converter,
+            IEntityConverter<Feed, FeedViewModel> feedConverter)
             : base(repository, converter)
         {
             this.settingsRepository = repository;
+            this.feedConverter = feedConverter;
         }
 
-        public SettingsViewModel GetByUserId(int userId)
+        public SettingsViewModel GetByFeed(FeedViewModel feed)
         {
-            Settings settings = settingsRepository.GetByUserId(userId);
+            Settings settings = settingsRepository.GetByFeed(feedConverter.ConvertToStoredModel(feed));
 
             return converter.ConvertToViewModel(settings);
         }

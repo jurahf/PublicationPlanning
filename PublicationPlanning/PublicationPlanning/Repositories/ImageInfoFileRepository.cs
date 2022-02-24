@@ -14,6 +14,8 @@ namespace PublicationPlanning.Repositories
 {
     public interface IImageInfoRepository : IRepository<ImageInfo>
     {
+        Task<IEnumerable<ImageInfo>> GetPage(Feed feed, int page, int limit);
+
         Task<IEnumerable<ImageInfo>> GetByOrders(int startOrder, int endOrder);
 
         Task RotateImage(ImageInfo imageInfo, float degrees);
@@ -44,6 +46,18 @@ namespace PublicationPlanning.Repositories
             lock (lockObject)
             {
                 return Task.FromResult(allData.Where(x => x.Order >= startOrder && x.Order <= endOrder));
+            }
+        }
+
+        public Task<IEnumerable<ImageInfo>> GetPage(Feed feed, int page, int limit)
+        {
+            lock (lockObject)
+            {
+                return Task.FromResult(allData
+                        .Where(x => x.Feed == null || x.Feed?.Id == feed?.Id)
+                        .OrderBy(x => x.DefaultOrder())
+                    .Skip(page * limit)
+                    .Take(limit));
             }
         }
 
@@ -125,7 +139,7 @@ namespace PublicationPlanning.Repositories
         /// <param name="entity"></param>
         private async Task<string> CheckAndCacheImage(ImageInfo entity)
         {
-            Settings settings = settingsRepository.GetByUserId(0);  // TODO: пока только 1 пользователь
+            Settings settings = settingsRepository.GetByFeed(entity.Feed);
             bool isLocal = entity.ImageRef.StartsWith(basePath);
 
             if (isLocal)

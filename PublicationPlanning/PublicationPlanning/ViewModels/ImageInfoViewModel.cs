@@ -17,5 +17,7 @@ namespace PublicationPlanning.ViewModels
         public ImageSourceType SourceType { get; set; }
 
         public ImageSource ImageSource { get; set; }
+
+        public FeedViewModel Feed { get; set; }
     }
 }

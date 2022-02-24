@@ -108,10 +108,10 @@ namespace PublicationPlanning
             }
         }
 
-        public SettingsPage(ISettingsService settingsService)
+        public SettingsPage(ISettingsService settingsService, SettingsViewModel settings)
         {
             this.settingsService = settingsService;
-            this.settings = settingsService.GetByUserId(0);
+            this.settings = settings;
             this.Disappearing += SettingsPage_Disappearing;
 
             InitializeComponent();

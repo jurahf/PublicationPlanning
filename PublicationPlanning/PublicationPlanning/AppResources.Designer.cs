@@ -115,6 +115,15 @@ namespace PublicationPlanning {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на My default feed.
+        /// </summary>
+        public static string DefaultFeedName {
+            get {
+                return ResourceManager.GetString("DefaultFeedName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Delete.
         /// </summary>
         public static string Delete {

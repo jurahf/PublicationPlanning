@@ -8,19 +8,21 @@ namespace PublicationPlanning.Repositories
 {
     public interface ISettingsRepository : IRepository<Settings>
     {
-        Settings GetByUserId(int userId);
+        Settings GetByFeed(Feed feed);
     }
 
 
     public class SettingsFileRepository : BaseFileRepository<Settings>, ISettingsRepository
     {
-        public Settings GetByUserId(int userId)
+        public Settings GetByFeed(Feed feed)
         {
-            // TODO: пока user и userId нет в модели. Этот метод надо изменить, когда появится авторизация
-            return allData.FirstOrDefault() ?? GetDefaultSettings();
+            if (feed?.Settings == null)
+                return GetDefaultSettings(feed);
+
+            return allData.FirstOrDefault(x => x.Id == feed.Settings.Id) ?? GetDefaultSettings(feed);
         }
 
-        private Settings GetDefaultSettings()
+        private Settings GetDefaultSettings(Feed feed)
         {
             return new Settings()
             {

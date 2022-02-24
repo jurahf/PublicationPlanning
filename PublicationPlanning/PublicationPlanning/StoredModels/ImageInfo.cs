@@ -12,6 +12,8 @@ namespace PublicationPlanning.StoredModels
 
         public int Order { get; set; }
 
+        public Feed Feed { get; set; }
+
         public ImageSourceType SourceType { get; set; }
 
         public int DefaultOrder()

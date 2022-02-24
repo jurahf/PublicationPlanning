@@ -23,7 +23,9 @@ namespace PublicationPlanning
             var navigationPage = new NavigationPage(
                 new MainPage(
                     serviceProvider.GetService<IImageInfoService>(),
-                    serviceProvider.GetService<ISettingsService>()
+                    serviceProvider.GetService<ISettingsService>(),
+                    serviceProvider.GetService<IFeedService>(),
+                    serviceProvider.GetService<IUserService>()
                     ));
 
             navigationPage.BarBackgroundColor = Color.FromHex("2196F3");
@@ -41,6 +43,14 @@ namespace PublicationPlanning
             services.AddSingleton<IEntityConverter<ImageInfo, ImageInfoViewModel>, ImageInfoConverter>();
             services.AddSingleton<IImageInfoRepository, ImageInfoFileRepository>();
             services.AddSingleton<IImageInfoService, ImageInfoService>();
+
+            services.AddSingleton<IEntityConverter<User, UserViewModel>, UserConverter>();
+            services.AddSingleton<IUserRepository, UserFileRepository>();
+            services.AddSingleton<IUserService, UserService>();
+
+            services.AddSingleton<IEntityConverter<Feed, FeedViewModel>, FeedConverter>();
+            services.AddSingleton<IFeedRepository, FeedFileRepository>();
+            services.AddSingleton<IFeedService, FeedService>();
 
             serviceProvider = services.BuildServiceProvider();
         }

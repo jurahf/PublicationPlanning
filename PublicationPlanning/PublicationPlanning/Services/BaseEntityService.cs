@@ -14,7 +14,7 @@ namespace PublicationPlanning.Services
         where TStored : IStoredEntity
         where TView : IViewEntity
     {
-        protected readonly IRepository<TStored> repository;
+        private readonly IRepository<TStored> repository;
         protected readonly IEntityConverter<TStored, TView> converter;
 
         public BaseEntityService(

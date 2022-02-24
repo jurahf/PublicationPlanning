@@ -9,6 +9,13 @@ namespace PublicationPlanning.Converters
 {
     public class ImageInfoConverter : IEntityConverter<ImageInfo, ImageInfoViewModel>
     {
+        private readonly IEntityConverter<Feed, FeedViewModel> feedConverter;
+
+        public ImageInfoConverter(IEntityConverter<Feed, FeedViewModel> feedConverter)
+        {
+            this.feedConverter = feedConverter;
+        }
+
         public ImageInfo ConvertToStoredModel(ImageInfoViewModel view)
         {
             if (view == null)
@@ -19,7 +26,8 @@ namespace PublicationPlanning.Converters
                 Id = view.Id,
                 ImageRef = view.ImageRef,
                 Order = view.Order,
-                SourceType = view.SourceType
+                SourceType = view.SourceType,
+                Feed = feedConverter.ConvertToStoredModel(view.Feed),
             };
         }
 
@@ -34,7 +42,8 @@ namespace PublicationPlanning.Converters
                 ImageRef = stored.ImageRef,
                 Order = stored.Order,
                 SourceType = stored.SourceType,
-                ImageSource = GetImageSource(stored.ImageRef, stored.SourceType)
+                ImageSource = GetImageSource(stored.ImageRef, stored.SourceType),
+                Feed = feedConverter.ConvertToViewModel(stored.Feed),
             };
         }
 

@@ -135,6 +135,9 @@
   <data name="ColumnsCountFormat" xml:space="preserve">
     <value>Columns count: {0}</value>
   </data>
+  <data name="DefaultFeedName" xml:space="preserve">
+    <value>My default feed</value>
+  </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
   </data>

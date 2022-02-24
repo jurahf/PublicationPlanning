@@ -13,6 +13,8 @@ namespace PublicationPlanning.Services
 {
     public interface IImageInfoService : IEntityService<ImageInfoViewModel>
     {
+        Task<IEnumerable<ImageInfoViewModel>> GetPage(FeedViewModel feed, int page, int limit);
+
         Task<int> InsertFirst(ImageInfoViewModel entity);
 
         Task MoveOrder(ImageInfoViewModel entity, int newOrder);
@@ -23,18 +25,38 @@ namespace PublicationPlanning.Services
     public class ImageInfoService : BaseEntityService<ImageInfo, ImageInfoViewModel>, IImageInfoService
     {
         private readonly IImageInfoRepository imageRepository;
+        private readonly IEntityConverter<Feed, FeedViewModel> feedConverter;
 
         public ImageInfoService(
             IImageInfoRepository repository,
-            IEntityConverter<ImageInfo, ImageInfoViewModel> converter)
-            : base(repository, converter)
+            IEntityConverter<ImageInfo, ImageInfoViewModel> imageConverter,
+            IEntityConverter<Feed, FeedViewModel> feedConverter)
+            : base(repository, imageConverter)
         {
             this.imageRepository = repository;
+            this.feedConverter = feedConverter;
         }
+
+
+        public async Task<IEnumerable<ImageInfoViewModel>> GetPage(FeedViewModel feed, int page, int limit)
+        {
+            Feed dbFeed = feedConverter.ConvertToStoredModel(feed);
+            if (dbFeed == null)
+            {
+                return (await imageRepository.GetPage(page, limit))
+                    .Select(x => converter.ConvertToViewModel(x));
+            }
+            else
+            {
+                return (await imageRepository.GetPage(dbFeed, page, limit))
+                    .Select(x => converter.ConvertToViewModel(x));
+            }
+        }
+
 
         public async Task<int> InsertFirst(ImageInfoViewModel entity)
         {
-            ImageInfo oldFirst = (await repository.GetPage(0, 1)).FirstOrDefault();
+            ImageInfo oldFirst = (await imageRepository.GetPage(0, 1)).FirstOrDefault();
             entity.Order = oldFirst == null ? 0 : oldFirst.Order - 1;
 
             return await base.Insert(entity);
@@ -60,7 +82,7 @@ namespace PublicationPlanning.Services
 
             foreach (var image in imageList)
             {
-                await repository.Update(image.Id, image);
+                await imageRepository.Update(image.Id, image);
             }
         }
 

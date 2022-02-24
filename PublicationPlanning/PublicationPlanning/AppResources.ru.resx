@@ -135,6 +135,9 @@
   <data name="ColumnsCountFormat" xml:space="preserve">
     <value>Количество колонок: {0}</value>
   </data>
+  <data name="DefaultFeedName" xml:space="preserve">
+    <value>Моя основная лента</value>
+  </data>
   <data name="Delete" xml:space="preserve">
     <value>Удалить</value>
   </data>

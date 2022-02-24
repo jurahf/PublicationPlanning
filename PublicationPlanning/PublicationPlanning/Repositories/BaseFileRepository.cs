@@ -27,7 +27,7 @@ namespace PublicationPlanning.Repositories
         {
             basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             storageFileNamePattern = $"{typeof(T).Name}-*.txt";
-            storageFileNameFormat = $"{typeof(T).Name}-{0:yyyy-MM-dd-HH-mm-ss}.txt";
+            storageFileNameFormat = typeof(T).Name + "-{0:yyyy-MM-dd-HH-mm-ss}.txt";
 
             LoadAllData();
         }
@@ -45,7 +45,7 @@ namespace PublicationPlanning.Repositories
             if (entityList == null || !entityList.Any())
                 return "";
 
-            return JsonConvert.SerializeObject(entityList);
+            return JsonConvert.SerializeObject(entityList, new EntityJsonConverter());
         }
 
         private void LoadAllData()

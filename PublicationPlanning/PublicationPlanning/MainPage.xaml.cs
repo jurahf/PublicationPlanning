@@ -21,18 +21,33 @@ namespace PublicationPlanning
 {
     public partial class MainPage : ContentPage, ISelectImageContext, IDragDropContext
     {
-        private readonly IImageInfoService service;
+        private readonly IImageInfoService imageService;
         private readonly ISettingsService settingsService;
+        private readonly IFeedService feedService;
+        private readonly IUserService userService;
+
+        private UserViewModel currentUser;
+        private FeedViewModel currentFeed;
         private SettingsViewModel settings;
+
         List<(int order, int modelId, View view)> flexLayoutCells = new List<(int, int, View)>();
         private bool hiddingMode = false;
         List<ImageModelAndControl> hidden = new List<ImageModelAndControl>();
 
-        public MainPage(IImageInfoService service, ISettingsService settingsService)
+        public MainPage(
+            IImageInfoService imageService, 
+            ISettingsService settingsService, 
+            IFeedService feedService,
+            IUserService userService)
         {
-            this.service = service;
+            this.imageService = imageService;
             this.settingsService = settingsService;
-            this.settings = settingsService.GetByUserId(0);
+            this.feedService = feedService;
+            this.userService = userService;
+
+            currentUser = userService.GetCurrentUser();
+            currentFeed = feedService.GetActiveUserFeed(currentUser);
+            this.settings = settingsService.GetByFeed(currentFeed);
             
             InitializeComponent();
 
@@ -45,10 +60,10 @@ namespace PublicationPlanning
 
         private async void btnSettings_Clicked(object sender, EventArgs e)
         {
-            var settingsPage = new SettingsPage(settingsService);
+            var settingsPage = new SettingsPage(settingsService, settings);
             settingsPage.Disappearing += async (s, a) => 
             { 
-                settings = settingsService.GetByUserId(0);
+                settings = settingsService.GetByFeed(currentFeed);
                 await ShowImages();
             };
 
@@ -105,7 +120,7 @@ namespace PublicationPlanning
             if (selectedImage == null)
                 return;
 
-            await service.RotateImage(selectedImage.ImageInfoId, 90);
+            await imageService.RotateImage(selectedImage.ImageInfoId, 90);
 
             // иначе не придумал как перерисовать картинку
             Image imageControl = FindImageControl(selectedImage.Control);
@@ -129,7 +144,7 @@ namespace PublicationPlanning
 
             int deletedId = selectedImage.ImageInfoId;
 
-            await service.Delete(deletedId);
+            await imageService.Delete(deletedId);
             (_, _, View view) = flexLayoutCells.FirstOrDefault(x => x.modelId == deletedId);
 
             if (view != null)
@@ -148,13 +163,14 @@ namespace PublicationPlanning
                 var result = await MediaPicker.PickPhotoAsync(null);
                 if (result != null)
                 {
-                    int id = await service.InsertFirst(new ImageInfoViewModel()
+                    int id = await imageService.InsertFirst(new ImageInfoViewModel()
                     {
                         ImageRef = result.FullPath,
-                        SourceType = ImageSourceType.FilePath
+                        SourceType = ImageSourceType.FilePath,
+                        Feed = currentFeed
                     });
 
-                    ImageInfoViewModel image = await service.Get(id);
+                    ImageInfoViewModel image = await imageService.Get(id);
 
                     var stream = await result.OpenReadAsync();
                     AddImageToLayout(image);
@@ -177,7 +193,7 @@ namespace PublicationPlanning
             {
                 flexLayout.Children.Clear();
                 flexLayoutCells.Clear();
-                var allImages = await service.GetPage(0, settings.PageSize);
+                List<ImageInfoViewModel> allImages = (await imageService.GetPage(currentFeed, 0, settings.PageSize)).ToList();
 
                 foreach (var image in allImages.OrderBy(x => x.Order))
                 {
@@ -194,6 +210,9 @@ namespace PublicationPlanning
                 {
                     pnlEmpty.IsVisible = true;
                 }
+            }
+            catch (Exception ex)
+            {
             }
             finally
             {
@@ -382,8 +401,8 @@ namespace PublicationPlanning
                 return;
 
             var activeLandingInfo = activeDropLanding.First();      // ?!
-            ImageInfoViewModel dragged = await service.Get(src.ImageInfoId);
-            ImageInfoViewModel landing = await service.Get(activeLandingInfo.ImageInfoId);
+            ImageInfoViewModel dragged = await imageService.Get(src.ImageInfoId);
+            ImageInfoViewModel landing = await imageService.Get(activeLandingInfo.ImageInfoId);
 
             int startOrder = dragged.Order;
             int endOrder;
@@ -408,7 +427,7 @@ namespace PublicationPlanning
             if (startOrder != endOrder)
             {
                 // перемещаем в базе
-                await service.MoveOrder(dragged, endOrder);
+                await imageService.MoveOrder(dragged, endOrder);
 
                 // и на форме
                 MoveImageOnLayout(dragged.Id, startOrder, endOrder);
