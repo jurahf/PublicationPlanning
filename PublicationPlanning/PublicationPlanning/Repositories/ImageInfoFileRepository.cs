@@ -53,8 +53,19 @@ namespace PublicationPlanning.Repositories
         {
             lock (lockObject)
             {
+                // это для обновления с тех времен, когда картинки не были привязаны к лентам (лента была одна)
+                bool needUpdate = false;
+                foreach (var imageInfo in allData.Where(x => x.Feed == null))
+                {
+                    imageInfo.Feed = feed;
+                    needUpdate = true;
+                }
+
+                if (needUpdate)
+                    SaveChangesRequest();
+
                 return Task.FromResult(allData
-                        .Where(x => x.Feed == null || x.Feed?.Id == feed?.Id)
+                        .Where(x => x.Feed?.Id == feed?.Id)
                         .OrderBy(x => x.DefaultOrder())
                     .Skip(page * limit)
                     .Take(limit));

@@ -64,6 +64,9 @@ namespace PublicationPlanning.Services
 
         public async Task MoveOrder(ImageInfoViewModel entity, int newOrder)
         {
+            if (entity == null)
+                return;
+
             int oldOrder = entity.Order;
 
             List<ImageInfo> imageList = 
