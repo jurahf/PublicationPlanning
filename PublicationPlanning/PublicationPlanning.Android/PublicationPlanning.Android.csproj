@@ -120,11 +120,12 @@
     <Content Include="PrivacyPolicy.html" />
     <AndroidResource Include="Resources\drawable\rotateRight.png" />
     <AndroidResource Include="Resources\drawable\eyeClosed.png" />
+    <AndroidResource Include="Resources\drawable\edit.png" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties XamarinHotReloadDebuggerTimeoutExceptionSampleMobileAppAndroidHideInfoBar="True" XamarinHotReloadDebuggerTimeoutExceptionPublicationPlanningAndroidHideInfoBar="True" />
+      <UserProperties XamarinHotReloadDebuggerTimeoutExceptionPublicationPlanningAndroidHideInfoBar="True" XamarinHotReloadDebuggerTimeoutExceptionSampleMobileAppAndroidHideInfoBar="True" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>

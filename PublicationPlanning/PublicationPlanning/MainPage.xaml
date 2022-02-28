@@ -5,9 +5,29 @@
              Title="Publication planning"
              xmlns:resources="clr-namespace:PublicationPlanning">
 
-    <StackLayout Margin="0, 10, 0, 0">
-        <!-- кнопки настроек -->
-        <StackLayout Orientation="Horizontal" HorizontalOptions="EndAndExpand">
+    <StackLayout Margin="0, 0, 0, 0">
+        <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+            <!-- Выбор ленты -->
+            <StackLayout Orientation="Horizontal" HorizontalOptions="StartAndExpand" Margin="10, 0, 0, 0">
+                <Picker x:Name="pikFeed"
+                        TitleColor="#2196F3"                     
+                        SelectedIndexChanged="FeedSelectedIndexChanged"></Picker>
+                <ImageButton 
+                    Source="edit.png" 
+                    HeightRequest="25" 
+                    BackgroundColor="Transparent"
+                    Margin="0, 0, 5, 0"
+                    Clicked="btnFeedEdit_Clicked"/>
+                <ImageButton 
+                    Source="remove.png" 
+                    HeightRequest="25" 
+                    BackgroundColor="Transparent"
+                    Margin="0, 0, 10, 0"
+                    Clicked="btnFeedDelete_Clicked"/>
+            </StackLayout>
+
+            <!-- кнопки настроек -->
+            <StackLayout Orientation="Horizontal" HorizontalOptions="EndAndExpand">
             <ImageButton 
                 Source="info.png" 
                 HeightRequest="25" 
@@ -20,6 +40,7 @@
                 BackgroundColor="Transparent"
                 Margin="0, 0, 10, 0"
                 Clicked="btnSettings_Clicked"/>
+            </StackLayout>
         </StackLayout>
         
         <!-- кнопки действий с картинками -->
@@ -29,8 +50,8 @@
                 Text="{x:Static resources:AppResources.AddPhoto}"
                 Clicked="btnAddPhoto_Clicked"
                 BackgroundColor="DarkSeaGreen"
-                Padding="20, 0, 20, 0"
-                HeightRequest="60">
+                Padding="15, 0, 15, 0"
+                HeightRequest="50">
             </Button>
             <ImageButton 
                 x:Name="btnHidePhoto"
@@ -38,14 +59,14 @@
                 HorizontalOptions="Center" 
                 VerticalOptions="Center" 
                 Clicked="btnHidePhoto_Clicked"
-                Padding="15, 5, 15, 5"
-                HeightRequest="60">
+                Padding="10, 5, 10, 5"
+                HeightRequest="50">
             </ImageButton>
             <!--<ImageButton 
                 HorizontalOptions="Center" 
                 VerticalOptions="Center" 
                 Source="refresh.png"
-                HeightRequest="60"
+                HeightRequest="50"
                 Padding="20, 5, 20, 5"
                 Clicked="btnRefresh_Clicked"></ImageButton>-->
             <ImageButton 
@@ -53,18 +74,18 @@
                 Source="rotateRight.png"
                 HorizontalOptions="Center" 
                 VerticalOptions="Center" 
-                Padding="15, 5, 15, 5"
+                Padding="10, 5, 10, 5"
                 IsVisible="false"                
                 Clicked="btnRotateRight_Clicked"
-                HeightRequest="60">
+                HeightRequest="50">
             </ImageButton>
             <ImageButton 
                 x:Name="btnRemove"
                 HorizontalOptions="Center" 
                 VerticalOptions="Center" 
                 Source="remove.png"
-                HeightRequest="60"
-                Padding="15, 5, 15, 5"
+                HeightRequest="50"
+                Padding="10, 5, 10, 5"
                 IsVisible="false"
                 Clicked="btnRemove_Clicked"></ImageButton>            
         </StackLayout>

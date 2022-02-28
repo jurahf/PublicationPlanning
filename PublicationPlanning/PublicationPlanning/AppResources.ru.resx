@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AddFeed" xml:space="preserve">
+    <value>+ Добавить ленту</value>
+  </data>
   <data name="AddPhoto" xml:space="preserve">
     <value>Добавить фото</value>
   </data>
@@ -141,11 +144,17 @@
   <data name="Delete" xml:space="preserve">
     <value>Удалить</value>
   </data>
+  <data name="DeleteThisFeed" xml:space="preserve">
+    <value>Удалить эту ленту?</value>
+  </data>
   <data name="DeleteThisImage" xml:space="preserve">
     <value>Удалить это изображение?</value>
   </data>
   <data name="Deleting" xml:space="preserve">
     <value>Удаление</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Изменение</value>
   </data>
   <data name="Error" xml:space="preserve">
     <value>Ошибка</value>
@@ -162,8 +171,20 @@
   <data name="ImagesPerPageFormat" xml:space="preserve">
     <value>Изображений на странице: {0}</value>
   </data>
+  <data name="InputFeedName" xml:space="preserve">
+    <value>Введите название для новой ленты</value>
+  </data>
+  <data name="InputNewName" xml:space="preserve">
+    <value>Введите новое название</value>
+  </data>
   <data name="IsWhereYourPhotos" xml:space="preserve">
     <value>Тут будут отображаться ваши фотографии.</value>
+  </data>
+  <data name="NewFeed" xml:space="preserve">
+    <value>Новая лента</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>Готово</value>
   </data>
   <data name="PublicationPlanning" xml:space="preserve">
     <value>Publication Planning</value>

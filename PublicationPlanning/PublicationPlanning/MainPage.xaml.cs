@@ -48,14 +48,121 @@ namespace PublicationPlanning
             currentUser = userService.GetCurrentUser();
             currentFeed = feedService.GetActiveUserFeed(currentUser);
             this.settings = settingsService.GetByFeed(currentFeed);
-            
+
             InitializeComponent();
 
             //new TestPictures(service).LoadTestDataToStorage();
 
+            pikFeed.ItemDisplayBinding = new Binding(nameof(FeedViewModel.Name));
+
             ShowImages();
+            UpdateFeedPicker();
 
             this.SizeChanged += async (s, a) => await ShowImages();
+        }
+
+        private void UpdateFeedPicker()
+        {
+            var allFeeds = feedService.GetByUser(currentUser).OrderBy(x => x.Name).ToList();
+            allFeeds.Add(new FeedViewModel { Id = -1, Name = AppResources.AddFeed });           // костыль
+            pikFeed.ItemsSource = allFeeds;
+            var myCurrentFeed = allFeeds.FirstOrDefault(x => x.Id == (currentFeed?.Id ?? 0));
+
+            pikFeed.SelectedIndexChanged -= FeedSelectedIndexChanged;
+            pikFeed.SelectedIndex = pikFeed.ItemsSource.IndexOf(myCurrentFeed);
+            pikFeed.SelectedIndexChanged += FeedSelectedIndexChanged;
+        }
+
+        private async void FeedSelectedIndexChanged(object sender, EventArgs e)
+        {
+            FeedViewModel selected = (FeedViewModel)pikFeed.SelectedItem;
+
+            if (selected == null)
+                return;
+
+            bool createNew = selected.Id < 0;
+
+            if (createNew)
+            {
+                // CreateNewFeed
+                string name = await DisplayPromptAsync(
+                    AppResources.NewFeed,
+                    AppResources.InputFeedName,
+                    accept: AppResources.Ok,
+                    cancel: AppResources.Cancel);
+
+                if (string.IsNullOrEmpty(name))
+                    return;
+
+                selected = new FeedViewModel()
+                {
+                    Name = name,
+                    Owner = currentUser,
+                    //Settings = settings
+                };
+
+                selected.Id = await feedService.Insert(selected);
+            }
+
+            currentFeed = selected;
+            currentUser.ActiveFeedId = currentFeed.Id;
+            await userService.Update(currentUser.Id, currentUser);
+            this.settings = settingsService.GetByFeed(currentFeed);
+            await ShowImages();
+
+            if (createNew)
+                UpdateFeedPicker();
+        }
+
+        private async void btnFeedDelete_Clicked(object sender, EventArgs e)
+        {
+            FeedViewModel selected = (FeedViewModel)pikFeed.SelectedItem;
+
+            if (selected == null || selected.Id < 0)
+                return;
+
+            bool approve = await DisplayAlert(
+                AppResources.Deleting, 
+                AppResources.DeleteThisFeed, 
+                AppResources.Delete, 
+                AppResources.Cancel);
+
+            if (!approve)
+                return;
+
+            foreach (var (_, id, _) in flexLayoutCells)
+            {
+                await imageService.Delete(id);
+            }
+            await feedService.Delete(selected.Id);
+
+            currentFeed = feedService.GetActiveUserFeed(currentUser);
+            this.settings = settingsService.GetByFeed(currentFeed);
+            UpdateFeedPicker();
+            await ShowImages();
+        }
+
+        private async void btnFeedEdit_Clicked(object sender, EventArgs e)
+        {
+            FeedViewModel selected = (FeedViewModel)pikFeed.SelectedItem;
+
+            if (selected == null)
+                return;
+
+            string name = await DisplayPromptAsync(
+                AppResources.Edit,
+                AppResources.InputNewName,
+                initialValue: selected.Name,
+                accept: AppResources.Ok,
+                cancel: AppResources.Cancel);
+
+            if (string.IsNullOrEmpty(name))
+                return;
+
+            currentFeed.Name = name;
+            await feedService.Update(currentFeed.Id, currentFeed);
+
+            UpdateFeedPicker();
         }
 
         private async void btnSettings_Clicked(object sender, EventArgs e)

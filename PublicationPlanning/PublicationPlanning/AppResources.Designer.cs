@@ -61,6 +61,15 @@ namespace PublicationPlanning {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на + Add new feed.
+        /// </summary>
+        public static string AddFeed {
+            get {
+                return ResourceManager.GetString("AddFeed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Add photo.
         /// </summary>
         public static string AddPhoto {
@@ -133,6 +142,15 @@ namespace PublicationPlanning {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Delete this feed?.
+        /// </summary>
+        public static string DeleteThisFeed {
+            get {
+                return ResourceManager.GetString("DeleteThisFeed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Delete this image?.
         /// </summary>
         public static string DeleteThisImage {
@@ -147,6 +165,15 @@ namespace PublicationPlanning {
         public static string Deleting {
             get {
                 return ResourceManager.GetString("Deleting", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Edit.
+        /// </summary>
+        public static string Edit {
+            get {
+                return ResourceManager.GetString("Edit", resourceCulture);
             }
         }
         
@@ -196,11 +223,47 @@ namespace PublicationPlanning {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Input name for new feed.
+        /// </summary>
+        public static string InputFeedName {
+            get {
+                return ResourceManager.GetString("InputFeedName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Input new name.
+        /// </summary>
+        public static string InputNewName {
+            get {
+                return ResourceManager.GetString("InputNewName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на This is where your photos will be displayed..
         /// </summary>
         public static string IsWhereYourPhotos {
             get {
                 return ResourceManager.GetString("IsWhereYourPhotos", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на New feed.
+        /// </summary>
+        public static string NewFeed {
+            get {
+                return ResourceManager.GetString("NewFeed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на OK.
+        /// </summary>
+        public static string Ok {
+            get {
+                return ResourceManager.GetString("Ok", resourceCulture);
             }
         }
         
